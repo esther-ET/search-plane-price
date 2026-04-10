@@ -122,10 +122,9 @@ function createFlightCard(flight) {
       <i class="fas fa-bolt mr-1"></i>特价
     </div>` : '';
 
-  // 折扣标签 - 特价航班时显示在特价标签左方，否则显示在价格上方
-  const discountBadge = isSpecialPrice ?
-    `<div class="absolute top-4 right-24 bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded shadow">-${flight.discount}%</div>` :
-    (flight.discount >= 30 ? `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>` : '');
+  // 折扣标签 - 40%以上显示在特价左边，30-39%显示在价格上方
+  const discountBadge = flight.discount >= 30 ?
+    `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>` : '';
 
   // 标签
   let tagsHtml = '';
