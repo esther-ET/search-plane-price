@@ -68,6 +68,9 @@ function loadFlightList() {
 
   if (!container) return;
 
+  // 重置卡片计数器
+  flightCardCounter = 0;
+
   // 清空容器，保留加载状态
   container.innerHTML = '<div class="space-y-4" id="flight-cards-container"></div>';
   const cardsContainer = document.getElementById('flight-cards-container');
@@ -87,36 +90,41 @@ function loadFlightList() {
 }
 
 // 创建航班卡片（搜索页版本）
+let flightCardCounter = 0;
+
 function createFlightCard(flight) {
   const card = document.createElement('div');
   card.className = 'bg-white rounded-xl shadow-md overflow-hidden card-hover';
   card.setAttribute('data-flight-id', flight.id);
 
-  // 特价标签
-  const specialBadge = flight.isSpecial ?
-    `<div class="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
-      <i class="fas fa-bolt mr-1"></i>特价
-    </div>` : '';
+  flightCardCounter++;
 
-  // AI推荐标签
+  // AI推荐标签 - 放在特价左边
   let aiRecommendationBadge = '';
   if (showAIRecommendations) {
     const score = getFlightRecommendationScore(flight);
     if (score >= AI_RECOMMENDATION_THRESHOLD) {
       const scorePercent = Math.round(score);
-      const feedbackHtml = typeof createFeedbackButtons === 'function'
-        ? `<div class="absolute top-14 right-0 ${specialBadge ? 'translate-y-10' : ''} bg-white rounded-lg shadow-lg border border-purple-200 p-2 z-10">
+      // 只有每第5个卡片(5,10,15...)才显示反馈按钮
+      const feedbackHtml = (flightCardCounter % 5 === 0) && typeof createFeedbackButtons === 'function'
+        ? `<div class="absolute top-14 left-4 bg-white rounded-lg shadow-lg border border-purple-200 p-2 z-10">
             ${createFeedbackButtons(flight.id, 'search', score)}
            </div>`
         : '';
       aiRecommendationBadge = `
-        <div class="absolute top-4 right-4 ${specialBadge ? 'translate-y-10' : ''} bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow cursor-pointer hover:from-purple-600 hover:to-indigo-600 transition-colors" onclick="toggleSearchFeedback(this)">
+        <div class="absolute top-4 left-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow cursor-pointer hover:from-purple-600 hover:to-indigo-600 transition-colors" onclick="toggleSearchFeedback(this)">
           <i class="fas fa-robot mr-1"></i>AI推荐 ${scorePercent}分
         </div>
         ${feedbackHtml}
       `;
     }
   }
+
+  // 特价标签 - 放在右边
+  const specialBadge = flight.isSpecial ?
+    `<div class="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
+      <i class="fas fa-bolt mr-1"></i>特价
+    </div>` : '';
 
   // 折扣显示
   const discountBadge = flight.discount >= 30 ?
@@ -132,7 +140,7 @@ function createFlightCard(flight) {
 
   card.innerHTML = `
     <div class="relative">
-      ${specialBadge}${aiRecommendationBadge}
+      ${aiRecommendationBadge}${specialBadge}
       <div class="p-6">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
           <!-- 航班信息 -->
@@ -423,7 +431,7 @@ function toggleSearchFeedback(element) {
     if (el !== element) el.classList.remove('feedback-dropdown-open');
   });
 
-  // 找到对应的反馈面板
+  // 找到对应的反馈面板（现在是 nextElementSibling，因为是在同一层级）
   const feedbackPanel = element.nextElementSibling;
   if (feedbackPanel && feedbackPanel.classList.contains('bg-white')) {
     element.classList.toggle('feedback-dropdown-open');

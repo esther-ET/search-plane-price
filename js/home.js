@@ -295,7 +295,6 @@ function createFlightCard(flight, isFeatured = false) {
             <i class="fas fa-project-diagram mr-1"></i>相似度: ${(flight.similarityScore * 100).toFixed(0)}%
           </div>
         ` : ''}
-        ${typeof createFeedbackButtons === 'function' ? createFeedbackButtons(flight.id, 'home', flight.recommendationScore) : ''}
       </div>
       ` : ''}
 
