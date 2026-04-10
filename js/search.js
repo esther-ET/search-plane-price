@@ -222,7 +222,7 @@ function createFlightCard(flight) {
 
 // 设置筛选事件
 function setupFilterEvents() {
-  // 价格滑块
+  // 价格滑块 - 只更新状态，由应用筛选按钮触发
   const priceRange = document.getElementById('priceRange');
   const priceValue = document.getElementById('priceValue');
 
@@ -231,16 +231,17 @@ function setupFilterEvents() {
       const value = parseInt(this.value);
       priceValue.textContent = `¥500 - ¥${value}`;
       currentFilters.maxPrice = value;
+    });
+    priceRange.addEventListener('change', function() {
       applyFilters();
     });
   }
 
-  // 航空公司复选框
+  // 航空公司复选框 - 由应用筛选按钮触发
   const airlineCheckboxes = document.querySelectorAll('input[type="checkbox"]');
   airlineCheckboxes.forEach(checkbox => {
     checkbox.addEventListener('change', function() {
       updateSelectedAirlines();
-      applyFilters();
     });
   });
 
@@ -249,7 +250,6 @@ function setupFilterEvents() {
   if (specialOnly) {
     specialOnly.addEventListener('change', function() {
       currentFilters.specialOnly = this.checked;
-      applyFilters();
     });
   }
 
@@ -259,7 +259,6 @@ function setupFilterEvents() {
     radio.addEventListener('change', function() {
       if (this.checked) {
         currentFilters.cabin = this.parentElement.querySelector('span').textContent;
-        applyFilters();
       }
     });
   });
@@ -269,7 +268,6 @@ function setupFilterEvents() {
   if (preferDirect) {
     preferDirect.addEventListener('change', function() {
       currentFilters.preferDirect = this.checked;
-      applyFilters();
     });
   }
 
@@ -284,7 +282,6 @@ function setupFilterEvents() {
         const preferDirectEl = document.getElementById('prefer-direct');
         if (preferDirectEl) preferDirectEl.checked = false;
       }
-      applyFilters();
     });
   }
 }
