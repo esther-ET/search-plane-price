@@ -243,11 +243,19 @@ function setupFilterEvents() {
     });
   }
 
-  // 航空公司复选框 - 由应用筛选按钮触发
-  const airlineCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+  // 航空公司复选框
+  const airlineCheckboxes = document.querySelectorAll('aside input[type="checkbox"]');
   airlineCheckboxes.forEach(checkbox => {
+    // 跳过舱位和中转偏好复选框（它们有自己的事件处理）
+    if (checkbox.classList.contains('cabin-checkbox') ||
+        checkbox.id === 'prefer-direct' ||
+        checkbox.id === 'allow-transit' ||
+        checkbox.id === 'specialOnly') {
+      return;
+    }
     checkbox.addEventListener('change', function() {
       updateSelectedAirlines();
+      applyFilters();
     });
   });
 
@@ -256,6 +264,7 @@ function setupFilterEvents() {
   if (specialOnly) {
     specialOnly.addEventListener('change', function() {
       currentFilters.specialOnly = this.checked;
+      applyFilters();
     });
   }
 
@@ -264,6 +273,7 @@ function setupFilterEvents() {
   cabinCheckboxes.forEach(checkbox => {
     checkbox.addEventListener('change', function() {
       updateSelectedCabins();
+      applyFilters();
     });
   });
 
