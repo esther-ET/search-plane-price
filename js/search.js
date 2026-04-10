@@ -258,19 +258,35 @@ function setupFilterEvents() {
     });
   });
 
-  // 中转偏好 - 优先直飞
+  // 中转偏好 - 优先直飞（互斥：选这个就不能选包含中转）
   const preferDirect = document.getElementById('prefer-direct');
   if (preferDirect) {
     preferDirect.addEventListener('change', function() {
-      currentFilters.preferDirect = this.checked;
+      if (this.checked) {
+        // 勾选优先直飞时，取消包含中转
+        const allowTransit = document.getElementById('allow-transit');
+        if (allowTransit) allowTransit.checked = false;
+        currentFilters.preferDirect = true;
+        currentFilters.allowTransit = false;
+      } else {
+        currentFilters.preferDirect = false;
+      }
     });
   }
 
-  // 中转偏好 - 允许中转
+  // 中转偏好 - 包含中转（互斥：选这个就不能选优先直飞）
   const allowTransit = document.getElementById('allow-transit');
   if (allowTransit) {
     allowTransit.addEventListener('change', function() {
-      currentFilters.allowTransit = this.checked;
+      if (this.checked) {
+        // 勾选包含中转时，取消优先直飞
+        const preferDirectEl = document.getElementById('prefer-direct');
+        if (preferDirectEl) preferDirectEl.checked = false;
+        currentFilters.allowTransit = true;
+        currentFilters.preferDirect = false;
+      } else {
+        currentFilters.allowTransit = false;
+      }
     });
   }
 }
@@ -326,8 +342,8 @@ function applyFilters() {
       return false;
     }
 
-    // 中转偏好筛选
-    if (!currentFilters.allowTransit && flight.stops > 0) {
+    // 中转偏好筛选 - 优先直飞时过滤中转航班
+    if (currentFilters.preferDirect && flight.stops > 0) {
       return false;
     }
 
