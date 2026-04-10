@@ -8,7 +8,9 @@ let currentFilters = {
   specialOnly: false,
   cabins: ['经济舱'], // 支持多选舱位
   preferDirect: false,
-  allowTransit: true
+  allowTransit: true,
+  departureCity: '',
+  arrivalCity: ''
 };
 
 // AI推荐配置
@@ -343,6 +345,16 @@ function updateSelectedCabins() {
 // 应用筛选
 function applyFilters() {
   currentFlights = flightData.flights.filter(flight => {
+    // 出发城市筛选
+    if (currentFilters.departureCity && !flight.departure.city.includes(currentFilters.departureCity)) {
+      return false;
+    }
+
+    // 到达城市筛选
+    if (currentFilters.arrivalCity && !flight.arrival.city.includes(currentFilters.arrivalCity)) {
+      return false;
+    }
+
     // 价格筛选
     if (flight.price < currentFilters.minPrice || flight.price > currentFilters.maxPrice) {
       return false;
@@ -432,7 +444,9 @@ function resetFilters() {
     specialOnly: true,
     cabins: ['经济舱'],
     preferDirect: false,
-    allowTransit: true
+    allowTransit: true,
+    departureCity: '',
+    arrivalCity: ''
   };
 
   applyFilters();
@@ -548,6 +562,10 @@ function submitSearch() {
   // 更新中转偏好筛选状态
   currentFilters.preferDirect = preferDirect;
   currentFilters.allowTransit = allowTransit;
+
+  // 更新城市筛选条件
+  currentFilters.departureCity = departure;
+  currentFilters.arrivalCity = arrival;
 
   // 保存到搜索历史
   if (arrival) {
