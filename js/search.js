@@ -105,17 +105,11 @@ function createFlightCard(flight) {
     const score = getFlightRecommendationScore(flight);
     if (score >= AI_RECOMMENDATION_THRESHOLD) {
       const scorePercent = Math.round(score);
-      // 只有每第5个卡片(5,10,15...)才显示反馈按钮
-      const feedbackHtml = (flightCardCounter % 5 === 0) && typeof createFeedbackButtons === 'function'
-        ? `<div class="absolute top-10 right-16 bg-white rounded-lg shadow-lg border border-purple-200 p-2 z-10">
-            ${createFeedbackButtons(flight.id, 'search', score)}
-           </div>`
-        : '';
+      // 反馈按钮已移除，放在"查看详情"下方
       aiRecommendationBadge = `
-        <div class="absolute top-4 right-16 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow cursor-pointer hover:from-purple-600 hover:to-indigo-600 transition-colors" onclick="toggleSearchFeedback(this)">
+        <div class="absolute top-4 right-10 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
           <i class="fas fa-robot mr-1"></i>AI推荐 ${scorePercent}分
         </div>
-        ${feedbackHtml}
       `;
     }
   }
@@ -211,6 +205,12 @@ function createFlightCard(flight) {
                 <i class="far fa-heart"></i>
               </button>
             </div>
+            ${flightCardCounter % 5 === 0 && typeof createFeedbackButtons === 'function' ? `
+            <div class="mt-3 pt-3 border-t border-gray-200">
+              <div class="text-xs text-gray-500 mb-2">这个推荐对您有帮助吗？</div>
+              ${createFeedbackButtons(flight.id, 'search', getFlightRecommendationScore(flight))}
+            </div>
+            ` : ''}
           </div>
         </div>
       </div>
