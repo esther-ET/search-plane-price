@@ -14,6 +14,10 @@ let showAIRecommendations = true;
 const AI_RECOMMENDATION_THRESHOLD = 70; // 分数阈值
 
 document.addEventListener('DOMContentLoaded', function() {
+  // 恢复URL中的搜索条件
+  if (window.restoreSearchFromURL) {
+    restoreSearchFromURL();
+  }
   loadFlightList();
   setupFilterEvents();
   setupSorting();
