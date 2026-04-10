@@ -123,11 +123,11 @@ function createFlightCard(flight) {
     </div>` : '';
 
   // 折扣标签
-  // 40%+：显示在查看详情按钮上方（价格区域内），与特价标签平齐
+  // 40%+：显示在查看详情按钮上方居中，与特价标签平齐
   // 30-39%：显示在价格上方
   const discountBadge = flight.discount >= 30 ?
     (isSpecialPrice ?
-      `<div class="flex justify-end mb-2"><span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded shadow">-${flight.discount}%</span></div>` :
+      `<div class="flex justify-center mb-2"><span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded shadow">-${flight.discount}%</span></div>` :
       `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>`
     ) : '';
 
@@ -202,7 +202,7 @@ function createFlightCard(flight) {
               }
               <div class="text-green-600 font-medium mt-1">节省 ¥${flight.originalPrice ? (flight.originalPrice - flight.price).toLocaleString('zh-CN') : '0'}</div>
             </div>
-            ${isSpecialPrice ? `<div class="flex justify-end mb-2">${discountBadge}</div>` : ''}
+            ${isSpecialPrice ? `<div class="flex justify-center mb-2">${discountBadge}</div>` : ''}
             ${aiRecommendationBadge}
             <div class="mt-4 flex space-x-3">
               <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" onclick="viewFlightDetail(${flight.id})">
