@@ -107,7 +107,7 @@ function createFlightCard(flight) {
       const scorePercent = Math.round(score);
       // 只有每第5个卡片(5,10,15...)才显示反馈按钮
       const feedbackHtml = (flightCardCounter % 5 === 0) && typeof createFeedbackButtons === 'function'
-        ? `<div class="absolute top-14 left-4 bg-white rounded-lg shadow-lg border border-purple-200 p-2 z-10">
+        ? `<div class="absolute top-10 left-4 bg-white rounded-lg shadow-lg border border-purple-200 p-2 z-10">
             ${createFeedbackButtons(flight.id, 'search', score)}
            </div>`
         : '';
