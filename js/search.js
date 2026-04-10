@@ -351,13 +351,15 @@ function applyFilters() {
       return false;
     }
 
-    // 中转偏好筛选 - 优先直飞时过滤中转航班
+    // 中转偏好筛选
+    // 优先直飞时过滤掉所有中转航班
     if (currentFilters.preferDirect && flight.stops > 0) {
       return false;
     }
-
-    // 优先直飞：如果开启，会在排序时把直飞排到前面（不过滤掉中转）
-    // allowTransit 为 false 时才过滤中转航班
+    // 包含中转未勾选且非优先直飞模式时，也过滤中转航班
+    if (!currentFilters.allowTransit && !currentFilters.preferDirect && flight.stops > 0) {
+      return false;
+    }
 
     return true;
   });
