@@ -320,8 +320,10 @@ function updateSelectedAirlines() {
   currentFilters.airlines = [];
 
   checkboxes.forEach(checkbox => {
-    // 跳过舱位复选框
+    // 跳过非航空公司复选框
     if (checkbox.classList.contains('cabin-checkbox')) return;
+    if (checkbox.id === 'prefer-direct' || checkbox.id === 'allow-transit') return;
+    if (checkbox.id === 'specialOnly') return;
     if (checkbox.checked) {
       const airlineName = checkbox.parentElement.querySelector('span').textContent;
       currentFilters.airlines.push(airlineName);
@@ -360,8 +362,8 @@ function applyFilters() {
       return false;
     }
 
-    // 航空公司筛选
-    if (!currentFilters.airlines.includes(flight.airline)) {
+    // 航空公司筛选（airlines为空表示全选，不筛选）
+    if (currentFilters.airlines.length > 0 && !currentFilters.airlines.includes(flight.airline)) {
       return false;
     }
 
