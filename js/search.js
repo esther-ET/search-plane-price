@@ -192,7 +192,7 @@ function createFlightCard(flight) {
           </div>
 
           <!-- 价格和操作 -->
-          <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-20 md:pt-20 md:pl-6 md:w-64 ${flightCardCounter % 5 === 0 && typeof createFeedbackButtons === 'function' ? 'pb-12' : ''}">
+          <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-20 md:pt-20 md:pl-6 md:w-64 ${flightCardCounter % 5 === 0 && typeof createFeedbackButtons === 'function' ? 'pb-5' : ''}">
             <div class="text-right">
               ${discountBadge30 ? `<div class="mb-1">${discountBadge30}</div>` : ''}
               <div class="text-3xl font-bold text-gray-800">¥${flight.price.toLocaleString('zh-CN')}</div>
