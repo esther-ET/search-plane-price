@@ -6,7 +6,7 @@ let currentFilters = {
   maxPrice: 3000,
   airlines: flightData.filters.airlines, // 默认全选
   specialOnly: false,
-  cabin: '经济舱',
+  cabins: ['经济舱'], // 支持多选舱位
   preferDirect: false,
   allowTransit: true
 };
@@ -105,7 +105,6 @@ function createFlightCard(flight) {
     const score = getFlightRecommendationScore(flight);
     if (score >= AI_RECOMMENDATION_THRESHOLD) {
       const scorePercent = Math.round(score);
-      // 反馈按钮已移除，放在"查看详情"下方
       aiRecommendationBadge = `
         <div class="absolute top-4 right-20 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
           <i class="fas fa-robot mr-1"></i>AI推荐 ${scorePercent}分
@@ -114,9 +113,9 @@ function createFlightCard(flight) {
     }
   }
 
-  // 特价标签 - 放在右边
+  // 特价标签 - 放在卡片右上角，避免遮挡折扣
   const specialBadge = flight.isSpecial ?
-    `<div class="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
+    `<div class="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow z-10">
       <i class="fas fa-bolt mr-1"></i>特价
     </div>` : '';
 
@@ -187,9 +186,7 @@ function createFlightCard(flight) {
           <!-- 价格和操作 -->
           <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6 md:w-64">
             <div class="text-right">
-              <div class="flex items-center justify-end mb-2">
-                ${discountBadge}
-              </div>
+              ${discountBadge ? `<div class="mb-1">${discountBadge}</div>` : ''}
               <div class="text-3xl font-bold text-gray-800">¥${flight.price.toLocaleString('zh-CN')}</div>
               ${flight.originalPrice ?
                 `<div class="text-gray-500 line-through">原价 ¥${flight.originalPrice.toLocaleString('zh-CN')}</div>` :
@@ -253,13 +250,11 @@ function setupFilterEvents() {
     });
   }
 
-  // 舱位等级单选按钮
-  const cabinRadios = document.querySelectorAll('input[name="cabin"]');
-  cabinRadios.forEach(radio => {
-    radio.addEventListener('change', function() {
-      if (this.checked) {
-        currentFilters.cabin = this.parentElement.querySelector('span').textContent;
-      }
+  // 舱位等级复选框
+  const cabinCheckboxes = document.querySelectorAll('.cabin-checkbox');
+  cabinCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      updateSelectedCabins();
     });
   });
 
@@ -276,25 +271,34 @@ function setupFilterEvents() {
   if (allowTransit) {
     allowTransit.addEventListener('change', function() {
       currentFilters.allowTransit = this.checked;
-      // 如果不允许中转，自动关闭优先直飞
-      if (!this.checked) {
-        currentFilters.preferDirect = false;
-        const preferDirectEl = document.getElementById('prefer-direct');
-        if (preferDirectEl) preferDirectEl.checked = false;
-      }
     });
   }
 }
 
 // 更新选中的航空公司
 function updateSelectedAirlines() {
-  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const checkboxes = document.querySelectorAll('aside input[type="checkbox"]');
   currentFilters.airlines = [];
 
   checkboxes.forEach(checkbox => {
+    // 跳过舱位复选框
+    if (checkbox.classList.contains('cabin-checkbox')) return;
     if (checkbox.checked) {
       const airlineName = checkbox.parentElement.querySelector('span').textContent;
       currentFilters.airlines.push(airlineName);
+    }
+  });
+}
+
+// 更新选中的舱位
+function updateSelectedCabins() {
+  const checkboxes = document.querySelectorAll('.cabin-checkbox');
+  currentFilters.cabins = [];
+
+  checkboxes.forEach(checkbox => {
+    if (checkbox.checked) {
+      const cabinName = checkbox.parentElement.querySelector('span').textContent;
+      currentFilters.cabins.push(cabinName);
     }
   });
 }
@@ -312,8 +316,8 @@ function applyFilters() {
       return false;
     }
 
-    // 舱位筛选
-    if (currentFilters.cabin !== '所有舱位' && flight.cabin !== currentFilters.cabin) {
+    // 舱位筛选（支持多选）
+    if (currentFilters.cabins.length > 0 && !currentFilters.cabins.includes(flight.cabin)) {
       return false;
     }
 
@@ -357,14 +361,23 @@ function resetFilters() {
   const priceValue = document.getElementById('priceValue');
   if (priceValue) priceValue.textContent = '¥500 - ¥2500';
 
-  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-  checkboxes.forEach(checkbox => checkbox.checked = true);
+  // 重置航空公司复选框（除了舱位）
+  const airlineCheckboxes = document.querySelectorAll('aside input[type="checkbox"]');
+  airlineCheckboxes.forEach(checkbox => {
+    // 舱位复选框需要特殊处理
+    if (!checkbox.classList.contains('cabin-checkbox')) {
+      checkbox.checked = true;
+    }
+  });
+
+  // 重置舱位复选框 - 默认只选经济舱
+  const cabinCheckboxes = document.querySelectorAll('.cabin-checkbox');
+  cabinCheckboxes.forEach(checkbox => {
+    checkbox.checked = checkbox.parentElement.querySelector('span').textContent === '经济舱';
+  });
 
   const specialOnly = document.getElementById('specialOnly');
   if (specialOnly) specialOnly.checked = true;
-
-  const cabinRadios = document.querySelectorAll('input[name="cabin"]');
-  if (cabinRadios[0]) cabinRadios[0].checked = true;
 
   // 重置中转偏好
   const preferDirect = document.getElementById('prefer-direct');
@@ -378,7 +391,7 @@ function resetFilters() {
     maxPrice: 3000,
     airlines: flightData.filters.airlines,
     specialOnly: true,
-    cabin: '经济舱',
+    cabins: ['经济舱'],
     preferDirect: false,
     allowTransit: true
   };
