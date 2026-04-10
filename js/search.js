@@ -116,14 +116,16 @@ function createFlightCard(flight) {
   }
 
   // 特价标签 - 折扣>=40%显示特价
-  const specialBadge = flight.discount >= 40 ?
+  const isSpecialPrice = flight.discount >= 40;
+  const specialBadge = isSpecialPrice ?
     `<div class="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow z-10">
       <i class="fas fa-bolt mr-1"></i>特价
     </div>` : '';
 
-  // 折扣显示
-  const discountBadge = flight.discount >= 40 ?
-    `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>` : '';
+  // 折扣标签 - 特价航班时显示在特价标签左方，否则显示在价格上方
+  const discountBadge = isSpecialPrice ?
+    `<div class="absolute top-4 right-24 bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded shadow">-${flight.discount}%</div>` :
+    (flight.discount >= 30 ? `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>` : '');
 
   // 标签
   let tagsHtml = '';
