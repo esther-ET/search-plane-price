@@ -243,6 +243,12 @@ function setupFilterEvents() {
     });
   }
 
+  // 同步特殊checkbox的初始状态
+  const specialOnly = document.getElementById('specialOnly');
+  if (specialOnly) {
+    currentFilters.specialOnly = specialOnly.checked;
+  }
+
   // 航空公司复选框
   const airlineCheckboxes = document.querySelectorAll('aside input[type="checkbox"]');
   airlineCheckboxes.forEach(checkbox => {
