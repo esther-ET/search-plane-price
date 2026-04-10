@@ -280,10 +280,11 @@ function setupFilterEvents() {
       } else {
         currentFilters.preferDirect = false;
       }
+      applyFilters();
     });
   }
 
-  // 中转偏好 - 包含中转（互斥：选这个就不能选优先直飞）
+  // 中转偏好 - 包含中转（勾选即显示所有航班）
   const allowTransit = document.getElementById('allow-transit');
   if (allowTransit) {
     allowTransit.addEventListener('change', function() {
@@ -296,6 +297,7 @@ function setupFilterEvents() {
       } else {
         currentFilters.allowTransit = false;
       }
+      applyFilters();
     });
   }
 }
