@@ -113,14 +113,14 @@ function createFlightCard(flight) {
     }
   }
 
-  // 特价标签 - 放在卡片右上角，避免遮挡折扣
-  const specialBadge = flight.isSpecial ?
+  // 特价标签 - 折扣>=40%显示特价
+  const specialBadge = flight.discount >= 40 ?
     `<div class="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow z-10">
       <i class="fas fa-bolt mr-1"></i>特价
     </div>` : '';
 
   // 折扣显示
-  const discountBadge = flight.discount >= 30 ?
+  const discountBadge = flight.discount >= 40 ?
     `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>` : '';
 
   // 标签
