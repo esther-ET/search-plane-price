@@ -73,11 +73,34 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">出发日期</label>
                         <input type="date" id="search-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">人数</label>
+                        <select id="passenger-count" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="1">1人</option>
+                            <option value="2">2人</option>
+                            <option value="3">3人</option>
+                            <option value="4">4人</option>
+                            <option value="5">5人</option>
+                            <option value="6">6人</option>
+                        </select>
+                    </div>
                     <div class="flex items-end">
                         <button onclick="submitSearch()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200 flex items-center justify-center">
                             <i class="fas fa-search mr-2"></i>搜索特价
                         </button>
                     </div>
+                </div>
+                <!-- 中转偏好 -->
+                <div class="mt-4 flex items-center space-x-4">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" id="prefer-direct" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">优先显示直飞航班</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" id="allow-transit" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">包含中转航班</span>
+                    </label>
+                </div>
                 </div>
             </div>
         </section>

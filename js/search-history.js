@@ -207,10 +207,16 @@ function submitSearch() {
   const departureInput = document.getElementById('search-departure');
   const arrivalInput = document.getElementById('search-arrival');
   const dateInput = document.getElementById('search-date');
+  const passengerSelect = document.getElementById('passenger-count');
+  const preferDirectCheckbox = document.getElementById('prefer-direct');
+  const allowTransitCheckbox = document.getElementById('allow-transit');
 
   const departure = departureInput ? departureInput.value.trim() : '上海';
   const arrival = arrivalInput ? arrivalInput.value.trim() : '';
   const date = dateInput ? dateInput.value : '';
+  const passengers = passengerSelect ? passengerSelect.value : '1';
+  const preferDirect = preferDirectCheckbox ? preferDirectCheckbox.checked : false;
+  const allowTransit = allowTransitCheckbox ? allowTransitCheckbox.checked : true;
 
   if (!arrival) {
     // 如果没输入目的地，提示用户
@@ -226,6 +232,9 @@ function submitSearch() {
   if (date) {
     url += `&date=${encodeURIComponent(date)}`;
   }
+  url += `&passengers=${encodeURIComponent(passengers)}`;
+  url += `&preferDirect=${encodeURIComponent(preferDirect)}`;
+  url += `&allowTransit=${encodeURIComponent(allowTransit)}`;
   window.location.href = url;
 }
 
@@ -235,6 +244,9 @@ function restoreSearchFromURL() {
   const from = params.get('from');
   const to = params.get('to');
   const date = params.get('date');
+  const passengers = params.get('passengers');
+  const preferDirect = params.get('preferDirect');
+  const allowTransit = params.get('allowTransit');
 
   if (from) {
     const departureInput = document.getElementById('search-departure');
@@ -247,6 +259,24 @@ function restoreSearchFromURL() {
   if (date) {
     const dateInput = document.getElementById('search-date');
     if (dateInput) dateInput.value = date;
+  }
+
+  // 恢复中转偏好设置
+  if (preferDirect !== null) {
+    const preferDirectInput = document.getElementById('prefer-direct');
+    if (preferDirectInput) preferDirectInput.checked = preferDirect === 'true';
+  }
+  if (allowTransit !== null) {
+    const allowTransitInput = document.getElementById('allow-transit');
+    if (allowTransitInput) allowTransitInput.checked = allowTransit === 'true';
+  }
+
+  // 更新搜索摘要的人数显示
+  if (passengers) {
+    const summary = document.getElementById('searchSummary');
+    if (summary) {
+      summary.textContent = `${from || '上海'} → ${to || ''} · ${date || ''} · ${passengers}位乘客`;
+    }
   }
 }
 

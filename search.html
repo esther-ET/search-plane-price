@@ -190,6 +190,22 @@
                         <p class="text-sm text-gray-500 mt-1">显示折扣30%以上的航班</p>
                     </div>
 
+                    <!-- 中转偏好 -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-700 mb-3">中转偏好</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" id="prefer-direct">
+                                <span class="ml-2 text-gray-700">优先直飞</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked id="allow-transit">
+                                <span class="ml-2 text-gray-700">包含中转</span>
+                            </label>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">设置后优先显示符合您偏好的航班</p>
+                    </div>
+
                     <button onclick="applyFilters()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200">
                         应用筛选
                     </button>

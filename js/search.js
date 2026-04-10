@@ -6,7 +6,9 @@ let currentFilters = {
   maxPrice: 3000,
   airlines: flightData.filters.airlines, // 默认全选
   specialOnly: false,
-  cabin: '经济舱'
+  cabin: '经济舱',
+  preferDirect: false,
+  allowTransit: true
 };
 
 // AI推荐配置
@@ -253,6 +255,30 @@ function setupFilterEvents() {
       }
     });
   });
+
+  // 中转偏好 - 优先直飞
+  const preferDirect = document.getElementById('prefer-direct');
+  if (preferDirect) {
+    preferDirect.addEventListener('change', function() {
+      currentFilters.preferDirect = this.checked;
+      applyFilters();
+    });
+  }
+
+  // 中转偏好 - 允许中转
+  const allowTransit = document.getElementById('allow-transit');
+  if (allowTransit) {
+    allowTransit.addEventListener('change', function() {
+      currentFilters.allowTransit = this.checked;
+      // 如果不允许中转，自动关闭优先直飞
+      if (!this.checked) {
+        currentFilters.preferDirect = false;
+        const preferDirectEl = document.getElementById('prefer-direct');
+        if (preferDirectEl) preferDirectEl.checked = false;
+      }
+      applyFilters();
+    });
+  }
 }
 
 // 更新选中的航空公司
@@ -291,8 +317,27 @@ function applyFilters() {
       return false;
     }
 
+    // 中转偏好筛选
+    if (!currentFilters.allowTransit && flight.stops > 0) {
+      return false;
+    }
+
+    // 优先直飞：如果开启，会在排序时把直飞排到前面（不过滤掉中转）
+    // allowTransit 为 false 时才过滤中转航班
+
     return true;
   });
+
+  // 如果开启了"优先直飞"，对结果排序
+  if (currentFilters.preferDirect) {
+    currentFlights.sort((a, b) => {
+      // 直飞优先
+      if (a.stops === 0 && b.stops > 0) return -1;
+      if (a.stops > 0 && b.stops === 0) return 1;
+      // 都是直飞或都是中转，按价格排序
+      return a.price - b.price;
+    });
+  }
 
   loadFlightList();
   updateSearchSummary();
@@ -316,13 +361,21 @@ function resetFilters() {
   const cabinRadios = document.querySelectorAll('input[name="cabin"]');
   if (cabinRadios[0]) cabinRadios[0].checked = true;
 
+  // 重置中转偏好
+  const preferDirect = document.getElementById('prefer-direct');
+  if (preferDirect) preferDirect.checked = false;
+  const allowTransit = document.getElementById('allow-transit');
+  if (allowTransit) allowTransit.checked = true;
+
   // 重置筛选状态
   currentFilters = {
     minPrice: 500,
     maxPrice: 3000,
     airlines: flightData.filters.airlines,
     specialOnly: true,
-    cabin: '经济舱'
+    cabin: '经济舱',
+    preferDirect: false,
+    allowTransit: true
   };
 
   applyFilters();
@@ -581,7 +634,31 @@ document.addEventListener('DOMContentLoaded', function() {
   setupSorting();
   updateSearchSummary();
   renderPriceTrend(); // 渲染价格趋势图
+  // 恢复中转偏好设置
+  restoreTransitPreferences();
 });
+
+// 恢复中转偏好设置
+function restoreTransitPreferences() {
+  const params = new URLSearchParams(window.location.search);
+  const preferDirect = params.get('preferDirect');
+  const allowTransit = params.get('allowTransit');
+
+  if (preferDirect !== null) {
+    const preferDirectEl = document.getElementById('prefer-direct');
+    if (preferDirectEl) {
+      preferDirectEl.checked = preferDirect === 'true';
+      currentFilters.preferDirect = preferDirect === 'true';
+    }
+  }
+  if (allowTransit !== null) {
+    const allowTransitEl = document.getElementById('allow-transit');
+    if (allowTransitEl) {
+      allowTransitEl.checked = allowTransit === 'true';
+      currentFilters.allowTransit = allowTransit === 'true';
+    }
+  }
+}
 
 // 灵活日期搜索事件
 function setupFlexibleDateEvents() {
