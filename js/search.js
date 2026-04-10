@@ -122,9 +122,14 @@ function createFlightCard(flight) {
       <i class="fas fa-bolt mr-1"></i>特价
     </div>` : '';
 
-  // 折扣标签 - 40%以上显示在特价左边，30-39%显示在价格上方
+  // 折扣标签
+  // 40%+：显示在查看详情按钮上方（价格区域内），与特价标签平齐
+  // 30-39%：显示在价格上方
   const discountBadge = flight.discount >= 30 ?
-    `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>` : '';
+    (isSpecialPrice ?
+      `<div class="flex justify-end mb-2"><span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded shadow">-${flight.discount}%</span></div>` :
+      `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>`
+    ) : '';
 
   // 标签
   let tagsHtml = '';
@@ -189,7 +194,7 @@ function createFlightCard(flight) {
           <!-- 价格和操作 -->
           <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6 md:w-64">
             <div class="text-right">
-              ${discountBadge ? `<div class="mb-1">${discountBadge}</div>` : ''}
+              ${!isSpecialPrice && discountBadge ? `<div class="mb-1">${discountBadge}</div>` : ''}
               <div class="text-3xl font-bold text-gray-800">¥${flight.price.toLocaleString('zh-CN')}</div>
               ${flight.originalPrice ?
                 `<div class="text-gray-500 line-through">原价 ¥${flight.originalPrice.toLocaleString('zh-CN')}</div>` :
@@ -197,6 +202,7 @@ function createFlightCard(flight) {
               }
               <div class="text-green-600 font-medium mt-1">节省 ¥${flight.originalPrice ? (flight.originalPrice - flight.price).toLocaleString('zh-CN') : '0'}</div>
             </div>
+            ${isSpecialPrice ? `<div class="flex justify-end mb-2">${discountBadge}</div>` : ''}
             ${aiRecommendationBadge}
             <div class="mt-4 flex space-x-3">
               <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" onclick="viewFlightDetail(${flight.id})">
