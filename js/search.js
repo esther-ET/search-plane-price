@@ -187,7 +187,6 @@ function createFlightCard(flight) {
 
           <!-- 价格和操作 -->
           <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6 md:w-64">
-            ${aiRecommendationBadge}
             <div class="text-right">
               ${discountBadge ? `<div class="mb-1">${discountBadge}</div>` : ''}
               <div class="text-3xl font-bold text-gray-800">¥${flight.price.toLocaleString('zh-CN')}</div>
@@ -197,6 +196,7 @@ function createFlightCard(flight) {
               }
               <div class="text-green-600 font-medium mt-1">节省 ¥${flight.originalPrice ? (flight.originalPrice - flight.price).toLocaleString('zh-CN') : '0'}</div>
             </div>
+            ${aiRecommendationBadge}
             <div class="mt-4 flex space-x-3">
               <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" onclick="viewFlightDetail(${flight.id})">
                 查看详情
