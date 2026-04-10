@@ -10,15 +10,12 @@ function loadFeaturedFlights() {
   const container = document.getElementById('featured-flights');
   if (!container) return;
 
-  container.innerHTML = '';
-
-  // 显示加载状态
-  container.innerHTML = `
-    <div class="col-span-3 text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
-      <p class="text-gray-600">AI正在为您智能推荐特价航班...</p>
-    </div>
-  `;
+  // 显示骨架屏
+  if (window.showSkeleton) {
+    container.innerHTML = window.createRecommendationCardSkeleton() +
+                          window.createRecommendationCardSkeleton() +
+                          window.createRecommendationCardSkeleton();
+  }
 
   // 延迟执行以确保DOM已更新
   setTimeout(() => {

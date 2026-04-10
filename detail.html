@@ -211,7 +211,7 @@
                 <!-- 价格趋势 -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">价格趋势</h3>
-                    <div class="text-center py-8">
+                    <div class="text-center py-4">
                         <div class="inline-block relative">
                             <div class="w-32 h-32 rounded-full border-8 border-blue-100 flex items-center justify-center">
                                 <div class="text-center">
@@ -223,6 +223,122 @@
                         </div>
                         <p class="text-gray-600 mt-4">当前价格比30天平均低33%</p>
                         <p class="text-green-600 font-medium mt-2">建议立即购买</p>
+                    </div>
+                </div>
+
+                <!-- 出行小工具 -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mt-6" id="travel-tools-section">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-toolbox text-orange-500 mr-2"></i>出行小工具
+                    </h3>
+                    <div class="space-y-3">
+                        <!-- 行李额计算 -->
+                        <button onclick="showBaggageCalculator()" class="w-full flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-suitcase-rolling text-orange-600"></i>
+                            </div>
+                            <div class="text-left flex-1">
+                                <div class="font-medium text-gray-800">行李额计算</div>
+                                <div class="text-xs text-gray-500">免费/托运额度</div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </button>
+                        <!-- 时差计算 -->
+                        <button onclick="showTimezoneCalculator()" class="w-full flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-clock text-blue-600"></i>
+                            </div>
+                            <div class="text-left flex-1">
+                                <div class="font-medium text-gray-800">时差计算</div>
+                                <div class="text-xs text-gray-500">目的地当前时间</div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </button>
+                        <!-- 签证信息 -->
+                        <button onclick="showVisaInfo()" class="w-full flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-passport text-green-600"></i>
+                            </div>
+                            <div class="text-left flex-1">
+                                <div class="font-medium text-gray-800">签证信息</div>
+                                <div class="text-xs text-gray-500">入境政策速查</div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 行李额计算弹窗 -->
+                <div id="baggage-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+                    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">行李额计算</h3>
+                            <button onclick="closeModal('baggage-modal')" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-plane text-orange-600 mr-2"></i>
+                                    <span class="font-medium text-gray-800">经济舱</span>
+                                </div>
+                                <p class="text-sm text-gray-600">免费托运: <strong>1件, 每件23kg</strong></p>
+                                <p class="text-sm text-gray-600">手提行李: <strong>1件, 7kg</strong></p>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-plane text-blue-600 mr-2"></i>
+                                    <span class="font-medium text-gray-800">商务舱</span>
+                                </div>
+                                <p class="text-sm text-gray-600">免费托运: <strong>2件, 每件32kg</strong></p>
+                                <p class="text-sm text-gray-600">手提行李: <strong>2件, 10kg</strong></p>
+                            </div>
+                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-plane text-purple-600 mr-2"></i>
+                                    <span class="font-medium text-gray-800">头等舱</span>
+                                </div>
+                                <p class="text-sm text-gray-600">免费托运: <strong>3件, 每件32kg</strong></p>
+                                <p class="text-sm text-gray-600">手提行李: <strong>2件, 10kg</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 时差计算弹窗 -->
+                <div id="timezone-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+                    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">时差计算</h3>
+                            <button onclick="closeModal('timezone-modal')" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="text-center py-4" id="timezone-display">
+                            <div class="text-5xl font-bold text-blue-600 mb-2" id="destination-time">--:--</div>
+                            <div class="text-gray-600 mb-4" id="destination-date">加载中...</div>
+                            <div class="text-sm text-gray-500">目的地时间</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <div class="text-sm text-gray-500 mb-1">与北京时间时差</div>
+                            <div class="font-bold text-gray-800" id="timezone-diff">加载中...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 签证信息弹窗 -->
+                <div id="visa-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+                    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">签证信息</h3>
+                            <button onclick="closeModal('visa-modal')" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4" id="visa-info-content">
+                            <!-- 将由JavaScript填充 -->
+                        </div>
                     </div>
                 </div>
 

@@ -406,3 +406,109 @@ function setPriceAlert() {
     showNotification(`价格提醒已设置：当价格低于¥${targetPrice}时通知您`);
   }
 }
+
+// 出行小工具 - 行李额计算
+function showBaggageCalculator() {
+  const modal = document.getElementById('baggage-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+}
+
+// 出行小工具 - 时差计算
+function showTimezoneCalculator() {
+  if (!currentFlight) return;
+
+  const modal = document.getElementById('timezone-modal');
+  if (!modal) return;
+
+  modal.classList.remove('hidden');
+
+  // 时区数据
+  const timezones = {
+    '东京': { tz: 'Asia/Tokyo', diff: '+1小时' },
+    '大阪': { tz: 'Asia/Tokyo', diff: '+1小时' },
+    '曼谷': { tz: 'Asia/Bangkok', diff: '-1小时' },
+    '新加坡': { tz: 'Asia/Singapore', diff: '0小时' },
+    '首尔': { tz: 'Asia/Seoul', diff: '+1小时' },
+    '巴黎': { tz: 'Europe/Paris', diff: '-6小时' },
+    '伦敦': { tz: 'Europe/London', diff: '-8小时' },
+    '纽约': { tz: 'America/New_York', diff: '-13小时' },
+    '洛杉矶': { tz: 'America/Los_Angeles', diff: '-16小时' },
+    '悉尼': { tz: 'Australia/Sydney', diff: '+2小时' }
+  };
+
+  const city = currentFlight.arrival.city;
+  const tzData = timezones[city] || { tz: 'Asia/Shanghai', diff: '0小时' };
+
+  // 获取目的地当前时间
+  const now = new Date();
+  const destTime = new Date(now.toLocaleString('en-US', { timeZone: tzData.tz }));
+
+  document.getElementById('destination-time').textContent =
+    destTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('destination-date').textContent =
+    destTime.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
+  document.getElementById('timezone-diff').textContent = tzData.diff;
+}
+
+// 出行小工具 - 签证信息
+function showVisaInfo() {
+  if (!currentFlight) return;
+
+  const modal = document.getElementById('visa-modal');
+  if (!modal) return;
+
+  modal.classList.remove('hidden');
+
+  const city = currentFlight.arrival.city;
+
+  // 签证信息数据
+  const visaInfo = {
+    '东京': { needVisa: false, note: '持中国大陆护照免签入境15天' },
+    '大阪': { needVisa: false, note: '持中国大陆护照免签入境15天' },
+    '曼谷': { needVisa: true, note: '需办理落地签或提前申请旅游签证' },
+    '新加坡': { needVisa: true, note: '需提前申请签证，96小时转机免签' },
+    '首尔': { needVisa: false, note: '持中国大陆护照免签入境30天' },
+    '巴黎': { needVisa: true, note: '需办理申根签证（90天）' },
+    '伦敦': { needVisa: true, note: '需办理英国标准访客签证' },
+    '纽约': { needVisa: true, note: '需办理B1/B2旅游签证' },
+    '洛杉矶': { needVisa: true, note: '需办理B1/B2旅游签证' },
+    '悉尼': { needVisa: true, note: '需提前申请访客签证（600类）' }
+  };
+
+  const info = visaInfo[city] || { needVisa: true, note: '请提前查询最新签证政策' };
+
+  const content = document.getElementById('visa-info-content');
+  content.innerHTML = `
+    <div class="bg-gray-50 rounded-lg p-4">
+      <div class="flex items-center mb-2">
+        <i class="fas ${info.needVisa ? 'fa-exclamation-circle text-red-500' : 'fa-check-circle text-green-500'} mr-2"></i>
+        <span class="font-medium text-gray-800">${info.needVisa ? '需要签证' : '可能免签'}</span>
+      </div>
+      <p class="text-sm text-gray-600">${info.note}</p>
+    </div>
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <div class="flex items-center mb-2">
+        <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
+        <span class="font-medium text-gray-800">温馨提示</span>
+      </div>
+      <p class="text-sm text-gray-600">请以当地使领馆最新政策为准，建议提前3个月准备签证材料</p>
+    </div>
+  `;
+}
+
+// 关闭弹窗
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+// 点击弹窗背景关闭
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('fixed') && e.target.classList.contains('bg-black')) {
+    e.target.classList.add('hidden');
+  }
+});
