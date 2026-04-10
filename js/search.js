@@ -99,15 +99,17 @@ function createFlightCard(flight) {
 
   flightCardCounter++;
 
-  // AI推荐标签 - 放在特价左边
+  // AI推荐标签 - 放在卡片内容区域内
   let aiRecommendationBadge = '';
   if (showAIRecommendations) {
     const score = getFlightRecommendationScore(flight);
     if (score >= AI_RECOMMENDATION_THRESHOLD) {
       const scorePercent = Math.round(score);
       aiRecommendationBadge = `
-        <div class="absolute top-14 right-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
-          <i class="fas fa-robot mr-1"></i>AI推荐 ${scorePercent}分
+        <div class="flex justify-center mb-3">
+          <div class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
+            <i class="fas fa-robot mr-1"></i>AI推荐 ${scorePercent}分
+          </div>
         </div>
       `;
     }
@@ -133,7 +135,7 @@ function createFlightCard(flight) {
 
   card.innerHTML = `
     <div class="relative">
-      ${aiRecommendationBadge}${specialBadge}
+      ${specialBadge}
       <div class="p-6">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
           <!-- 航班信息 -->
@@ -185,6 +187,7 @@ function createFlightCard(flight) {
 
           <!-- 价格和操作 -->
           <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6 md:w-64">
+            ${aiRecommendationBadge}
             <div class="text-right">
               ${discountBadge ? `<div class="mb-1">${discountBadge}</div>` : ''}
               <div class="text-3xl font-bold text-gray-800">¥${flight.price.toLocaleString('zh-CN')}</div>
