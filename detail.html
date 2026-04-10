@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特价机票发现平台 - 航班详情</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .price-comparison {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        }
+        .discount-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .special-tag {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-plane-departure text-2xl text-blue-600"></i>
+                    <a href="index.html" class="text-xl font-bold text-gray-800 hover:text-blue-600">特价机票发现平台</a>
+                </div>
+                <div class="space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600">首页</a>
+                    <a href="search.html" class="text-gray-600 hover:text-blue-600">搜索航班</a>
+                    <a href="preferences.html" class="text-gray-600 hover:text-blue-600">我的偏好</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- 返回按钮 -->
+        <div class="mb-6">
+            <a href="search.html" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                <i class="fas fa-arrow-left mr-2"></i>返回搜索结果
+            </a>
+        </div>
+
+        <!-- 航班基本信息 -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <div class="flex items-center space-x-4 mb-2">
+                        <h1 class="text-3xl font-bold text-gray-800" id="flight-title">上海 → 东京</h1>
+                        <span class="special-tag text-white px-3 py-1 rounded-full text-sm font-medium">限时特价</span>
+                    </div>
+                    <p class="text-gray-600" id="flight-subtitle">中国东方航空 MU586 · 2025年4月15日 · 经济舱</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <div class="text-right">
+                        <div class="text-4xl font-bold text-gray-800" id="flight-price">¥1,200</div>
+                        <div class="text-gray-500 line-through" id="original-price">原价 ¥1,800</div>
+                        <div class="discount-badge text-white px-3 py-1 rounded-full inline-block mt-2" id="discount-rate">节省 33%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 航班行程 -->
+            <div class="border-t border-gray-200 pt-6">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-800" id="departure-city">上海</div>
+                        <div class="text-gray-600 text-sm" id="departure-airport">浦东机场 (PVG)</div>
+                        <div class="text-lg font-semibold text-gray-800 mt-2" id="departure-time">08:30</div>
+                        <div class="text-gray-500 text-sm" id="departure-date">2025年4月15日</div>
+                    </div>
+                    <div class="flex-1 px-8">
+                        <div class="relative">
+                            <div class="h-1 bg-blue-200"></div>
+                            <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-blue-600 rounded-full"></div>
+                            <div class="absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-blue-600 rounded-full"></div>
+                            <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-2 rounded-full shadow-md">
+                                <i class="fas fa-plane text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <div class="text-gray-700 font-medium" id="flight-duration">3小时30分</div>
+                            <div class="text-gray-500 text-sm">直飞</div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-800" id="arrival-city">东京</div>
+                        <div class="text-gray-600 text-sm" id="arrival-airport">羽田机场 (HND)</div>
+                        <div class="text-lg font-semibold text-gray-800 mt-2" id="arrival-time">12:00</div>
+                        <div class="text-gray-500 text-sm" id="arrival-date">2025年4月15日</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 价格对比 -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">价格对比</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="py-3 px-4 text-left text-gray-700 font-medium">平台</th>
+                                    <th class="py-3 px-4 text-left text-gray-700 font-medium">价格</th>
+                                    <th class="py-3 px-4 text-left text-gray-700 font-medium">节省</th>
+                                    <th class="py-3 px-4 text-left text-gray-700 font-medium">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="price-comparison">
+                                <!-- 价格对比数据将由JavaScript加载 -->
+                                <tr>
+                                    <td class="py-4 px-4 text-center text-gray-500" colspan="4">加载价格信息中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-6 p-4 price-comparison rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-lightbulb text-blue-600 text-xl mr-3"></i>
+                            <div>
+                                <p class="text-gray-800 font-medium">AI比价建议</p>
+                                <p class="text-gray-600 text-sm">本平台找到的价格比其他平台平均低 <span class="font-bold text-green-600">15-25%</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 规则解析 -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">促销规则解析</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-gray-800 font-medium">限时特价</p>
+                                <p class="text-gray-600">此价格仅在 <span class="font-medium" id="valid-until">2025年4月12日23:59前</span> 有效</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-gray-800 font-medium">早鸟优惠</p>
+                                <p class="text-gray-600">提前14天预订可享受此价格</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-gray-800 font-medium">免费行李额</p>
+                                <p class="text-gray-600">包含23kg托运行李和7kg手提行李</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-gray-800 font-medium">改签政策</p>
+                                <p class="text-gray-600">特价机票改签需支付¥300手续费</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 相似航班推荐 -->
+                <div class="bg-white rounded-xl shadow-lg p-6" id="similar-flights-section">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-magic text-purple-500 mr-2"></i>相似航班推荐
+                        </h2>
+                        <span class="text-sm text-gray-500">基于协同过滤算法</span>
+                    </div>
+                    <div id="similar-flights-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>正在加载相似航班...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div>
+                <!-- 预订卡片 -->
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-8 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">立即预订</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-gray-700 mb-2">选择乘客数量</p>
+                            <div class="flex items-center border border-gray-300 rounded-lg">
+                                <button class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100" id="decrease-passenger">-</button>
+                                <span class="flex-1 text-center font-medium" id="passenger-count">1</span>
+                                <button class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100" id="increase-passenger">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-gray-700 mb-2">总价格</p>
+                            <div class="text-3xl font-bold text-gray-800" id="total-price">¥1,200</div>
+                        </div>
+                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200 flex items-center justify-center">
+                            <i class="fas fa-shopping-cart mr-2"></i>前往预订平台
+                        </button>
+                        <p class="text-gray-500 text-sm text-center">将跳转到合作平台完成预订</p>
+                    </div>
+                </div>
+
+                <!-- 价格趋势 -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">价格趋势</h3>
+                    <div class="text-center py-8">
+                        <div class="inline-block relative">
+                            <div class="w-32 h-32 rounded-full border-8 border-blue-100 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-600">-33%</div>
+                                    <div class="text-gray-600 text-sm">低于平均价</div>
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 w-32 h-32 rounded-full border-8 border-transparent border-t-blue-500 border-r-blue-400 animate-spin"></div>
+                        </div>
+                        <p class="text-gray-600 mt-4">当前价格比30天平均低33%</p>
+                        <p class="text-green-600 font-medium mt-2">建议立即购买</p>
+                    </div>
+                </div>
+
+                <!-- 分享 -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">分享特价</h3>
+                    <div class="flex justify-center space-x-4">
+                        <button class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200">
+                            <i class="fab fa-weixin"></i>
+                        </button>
+                        <button class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200">
+                            <i class="fab fa-weibo"></i>
+                        </button>
+                        <button class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200">
+                            <i class="fas fa-link"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="text-gray-400">特价机票发现平台 © 2025 - 帮助旅行者发现隐藏的特价机票</p>
+                <p class="text-gray-500 text-sm mt-2">本平台为演示原型，数据为模拟数据</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/data.js"></script>
+    <script src="js/recommendation.js"></script>
+    <script src="js/abtest.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/detail.js"></script>
+</body>
+</html>

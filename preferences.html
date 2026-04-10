@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特价机票发现平台 - 我的偏好</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .preference-card {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.2s ease;
+        }
+        .preference-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #3b82f6;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-plane-departure text-2xl text-blue-600"></i>
+                    <a href="index.html" class="text-xl font-bold text-gray-800 hover:text-blue-600">特价机票发现平台</a>
+                </div>
+                <div class="space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600">首页</a>
+                    <a href="search.html" class="text-gray-600 hover:text-blue-600">搜索航班</a>
+                    <a href="preferences.html" class="text-blue-600 font-medium">我的偏好</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- 页面标题 -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">我的偏好设置</h1>
+                <p class="text-gray-600">设置您的旅行偏好，获得更精准的推荐</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- 左侧设置区域 -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- 基础偏好 -->
+                    <div class="bg-white rounded-xl preference-card p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-user-circle text-blue-500 mr-3"></i>基础偏好
+                        </h2>
+                        <div class="space-y-6">
+                            <!-- 常用出发地 -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-3">常用出发城市</label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <input type="text" id="departure-city-1" placeholder="例如：上海"
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                    <div>
+                                        <input type="text" id="departure-city-2" placeholder="例如：北京"
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                </div>
+                                <p class="text-gray-500 text-sm mt-2">设置常用出发地，搜索时优先显示相关航班</p>
+                            </div>
+
+                            <!-- 价格敏感度 -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-3">价格敏感度</label>
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-1">
+                                        <input type="range" min="1" max="5" value="3"
+                                               class="w-full" id="price-sensitivity">
+                                        <div class="flex justify-between text-sm text-gray-500 mt-1">
+                                            <span>价格优先</span>
+                                            <span>平衡</span>
+                                            <span>品质优先</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-lg font-medium text-blue-600" id="sensitivity-value">中等</div>
+                                </div>
+                            </div>
+
+                            <!-- 舱位偏好 -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-3">舱位偏好</label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded text-blue-600" checked>
+                                        <span class="ml-2 text-gray-700">经济舱</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded text-blue-600">
+                                        <span class="ml-2 text-gray-700">超级经济舱</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded text-blue-600">
+                                        <span class="ml-2 text-gray-700">商务舱</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded text-blue-600">
+                                        <span class="ml-2 text-gray-700">头等舱</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 通知设置 -->
+                    <div class="bg-white rounded-xl preference-card p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-bell text-orange-500 mr-3"></i>通知设置
+                        </h2>
+                        <div class="space-y-6">
+                            <!-- 价格提醒开关 -->
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-800">价格提醒</h3>
+                                    <p class="text-gray-600 text-sm">关注航班降价时通知您</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="price-alerts-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <!-- 特价推送 -->
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-800">特价推送</h3>
+                                    <p class="text-gray-600 text-sm">每日精选特价航班推送</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="deal-notifications-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <!-- 推送频率 -->
+                            <div id="notification-frequency" class="space-y-4">
+                                <label class="block text-gray-700 font-medium">推送频率</label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="frequency" class="text-blue-600" checked>
+                                        <span class="ml-2 text-gray-700">每日一次</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="frequency" class="text-blue-600">
+                                        <span class="ml-2 text-gray-700">每周精选</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="frequency" class="text-blue-600">
+                                        <span class="ml-2 text-gray-700">实时推送</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 航空公司偏好 -->
+                    <div class="bg-white rounded-xl preference-card p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-plane text-green-500 mr-3"></i>航空公司偏好
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">中国东方航空</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">中国国际航空</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">南方航空</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="ml-2 text-gray-700">日本航空</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="ml-2 text-gray-700">大韩航空</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="ml-2 text-gray-700">新加坡航空</span>
+                            </label>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-4">优先显示您偏好的航空公司航班</p>
+                    </div>
+                </div>
+
+                <!-- 右侧摘要 -->
+                <div>
+                    <!-- 保存设置卡片 -->
+                    <div class="bg-white rounded-xl preference-card p-6 sticky top-8 mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">设置摘要</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">常用出发地</span>
+                                <span class="font-medium text-gray-800" id="summary-departure">未设置</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">价格敏感度</span>
+                                <span class="font-medium text-gray-800" id="summary-sensitivity">中等</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">价格提醒</span>
+                                <span class="font-medium text-green-600" id="summary-alerts">开启</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">特价推送</span>
+                                <span class="font-medium text-green-600" id="summary-deals">开启</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 space-y-4">
+                            <button id="save-preferences"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200 flex items-center justify-center">
+                                <i class="fas fa-save mr-2"></i>保存设置
+                            </button>
+                            <button id="reset-preferences"
+                                    class="w-full border border-gray-300 text-gray-700 font-medium py-3 rounded-lg transition duration-200 hover:bg-gray-50">
+                                恢复默认
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 价格提醒管理 -->
+                    <div class="bg-white rounded-xl preference-card p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">我的价格提醒</h3>
+                        <div id="active-alerts" class="space-y-3">
+                            <!-- 动态加载的价格提醒 -->
+                            <div class="text-center py-4 text-gray-500">
+                                <i class="fas fa-bell-slash text-2xl mb-2"></i>
+                                <p>暂无活跃的价格提醒</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='search.html'"
+                                class="w-full mt-4 border border-blue-600 text-blue-600 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 transition duration-200">
+                            <i class="fas fa-plus mr-2"></i>添加新提醒
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="text-gray-400">特价机票发现平台 © 2025 - 帮助旅行者发现隐藏的特价机票</p>
+                <p class="text-gray-500 text-sm mt-2">本平台为演示原型，数据为模拟数据</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/preferences.js"></script>
+</body>
+</html>

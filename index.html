@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特价机票发现平台 - 首页</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-plane-departure text-2xl text-blue-600"></i>
+                    <h1 class="text-xl font-bold text-gray-800">特价机票发现平台</h1>
+                </div>
+                <div class="space-x-4">
+                    <a href="index.html" class="text-blue-600 font-medium">首页</a>
+                    <a href="search.html" class="text-gray-600 hover:text-blue-600">搜索航班</a>
+                    <a href="preferences.html" class="text-gray-600 hover:text-blue-600">我的偏好</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 欢迎区域 -->
+        <section class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">发现隐藏的特价机票</h2>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                聚合各大平台特价信息，AI智能推荐，帮您节省高达60%的机票费用
+            </p>
+        </section>
+
+        <!-- 搜索框 -->
+        <section class="max-w-4xl mx-auto mb-12">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">出发城市</label>
+                        <input type="text" placeholder="例如：上海" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">到达城市</label>
+                        <input type="text" placeholder="例如：东京" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">出发日期</label>
+                        <input type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="window.location.href='search.html'" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200 flex items-center justify-center">
+                            <i class="fas fa-search mr-2"></i>搜索特价
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 特价推荐 -->
+        <section class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">今日特价推荐</h3>
+                <a href="search.html" class="text-blue-600 hover:text-blue-800 font-medium">查看全部特价 →</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="featured-flights">
+                <!-- 特价航班卡片将由JavaScript动态加载 -->
+                <div class="text-center py-8">
+                    <div class="animate-pulse">
+                        <div class="h-48 bg-gray-200 rounded-xl mb-4"></div>
+                        <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
+                        <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 价值主张 -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-bolt text-blue-600 text-xl"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-800 mb-2">实时比价</h4>
+                <p class="text-gray-600">聚合多个平台价格，确保找到最低价</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-star text-green-600 text-xl"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-800 mb-2">智能推荐</h4>
+                <p class="text-gray-600">AI算法识别真正的高性价比航班</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clock text-orange-600 text-xl"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-800 mb-2">价格提醒</h4>
+                <p class="text-gray-600">设置目标价格，降价时第一时间通知</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="text-gray-400">特价机票发现平台 © 2025 - 帮助旅行者发现隐藏的特价机票</p>
+                <p class="text-gray-500 text-sm mt-2">本平台为演示原型，数据为模拟数据</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/data.js"></script>
+    <script src="js/recommendation.js"></script>
+    <script src="js/abtest.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>

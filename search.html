@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特价机票发现平台 - 搜索航班</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease;
+        }
+        .special-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #3b82f6;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-plane-departure text-2xl text-blue-600"></i>
+                    <a href="index.html" class="text-xl font-bold text-gray-800 hover:text-blue-600">特价机票发现平台</a>
+                </div>
+                <div class="space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600">首页</a>
+                    <a href="search.html" class="text-blue-600 font-medium">搜索航班</a>
+                    <a href="preferences.html" class="text-gray-600 hover:text-blue-600">我的偏好</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- 筛选侧边栏 -->
+            <aside class="lg:w-1/4">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">筛选条件</h3>
+
+                    <!-- 使用我的偏好 -->
+                    <div class="mb-6 pb-6 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-medium text-gray-800">使用我的偏好</h4>
+                                <p class="text-gray-500 text-sm mt-1">自动应用您的偏好设置</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="use-preferences-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- AI推荐标注 -->
+                    <div class="mb-6 pb-6 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-medium text-gray-800">显示AI推荐</h4>
+                                <p class="text-gray-500 text-sm mt-1">标注AI算法推荐的高分航班</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="show-ai-recommendations" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 价格范围 -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-700 mb-3">价格范围 (¥)</h4>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-gray-600">¥500</span>
+                            <span class="text-sm text-gray-600">¥5000</span>
+                        </div>
+                        <input type="range" min="500" max="5000" value="2500" class="w-full" id="priceRange">
+                        <div class="text-center mt-2">
+                            <span class="text-blue-600 font-medium" id="priceValue">¥500 - ¥2500</span>
+                        </div>
+                    </div>
+
+                    <!-- 航空公司 -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-700 mb-3">航空公司</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">中国东方航空</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">中国国际航空</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">南方航空</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="ml-2 text-gray-700">国泰航空</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 舱位等级 -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-700 mb-3">舱位等级</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="cabin" class="text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">经济舱</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="cabin" class="text-blue-600">
+                                <span class="ml-2 text-gray-700">商务舱</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="cabin" class="text-blue-600">
+                                <span class="ml-2 text-gray-700">头等舱</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 特价筛选 -->
+                    <div class="mb-6">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded text-blue-600" checked id="specialOnly">
+                            <span class="ml-2 text-gray-700 font-medium">仅显示特价航班</span>
+                        </label>
+                        <p class="text-sm text-gray-500 mt-1">显示折扣30%以上的航班</p>
+                    </div>
+
+                    <button onclick="applyFilters()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200">
+                        应用筛选
+                    </button>
+                </div>
+            </aside>
+
+            <!-- 航班列表 -->
+            <div class="lg:w-3/4">
+                <!-- 搜索头部 -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">搜索航班</h2>
+                            <p class="text-gray-600" id="searchSummary">上海 → 东京 · 2025-04-15 · 1位成人</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="relative">
+                                <select class="appearance-none bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option>价格从低到高</option>
+                                    <option>价格从高到低</option>
+                                    <option>出发时间最早</option>
+                                    <option>折扣幅度最大</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-500"></i>
+                            </div>
+                            <button onclick="resetFilters()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 航班列表 -->
+                <div id="flight-list">
+                    <!-- 航班卡片将由JavaScript动态加载 -->
+                    <div class="space-y-4">
+                        <!-- 加载占位符 -->
+                        <div class="bg-white rounded-xl shadow-md p-6 animate-pulse">
+                            <div class="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
+                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分页 -->
+                <div class="flex justify-center mt-8">
+                    <nav class="flex items-center space-x-2">
+                        <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600 text-white">1</button>
+                        <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">2</button>
+                        <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">3</button>
+                        <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- 空状态 -->
+                <div id="no-results" class="hidden text-center py-12">
+                    <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-medium text-gray-700 mb-2">未找到匹配的航班</h3>
+                    <p class="text-gray-500">请尝试调整筛选条件或搜索其他目的地</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="text-gray-400">特价机票发现平台 © 2025 - 帮助旅行者发现隐藏的特价机票</p>
+                <p class="text-gray-500 text-sm mt-2">本平台为演示原型，数据为模拟数据</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/data.js"></script>
+    <script src="js/recommendation.js"></script>
+    <script src="js/abtest.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/search.js"></script>
+</body>
+</html>
