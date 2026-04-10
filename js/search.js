@@ -569,13 +569,181 @@ function setupAIRecommendationEvents() {
 
 // 修改DOMContentLoaded事件
 document.addEventListener('DOMContentLoaded', function() {
+  // 恢复URL中的搜索条件
+  if (window.restoreSearchFromURL) {
+    restoreSearchFromURL();
+  }
   loadFlightList();
   setupFilterEvents();
   setupPreferenceEvents(); // 新增
   setupAIRecommendationEvents(); // AI推荐事件
+  setupFlexibleDateEvents(); // 灵活日期事件
   setupSorting();
   updateSearchSummary();
+  renderPriceTrend(); // 渲染价格趋势图
 });
+
+// 灵活日期搜索事件
+function setupFlexibleDateEvents() {
+  const flexibleToggle = document.getElementById('flexible-dates-toggle');
+  if (!flexibleToggle) return;
+
+  flexibleToggle.addEventListener('change', function() {
+    if (this.checked) {
+      showNotification('已开启灵活日期，查看前后3天价格', 'info');
+      renderFlexibleDatesInfo();
+    } else {
+      showNotification('已关闭灵活日期', 'info');
+      hideFlexibleDatesInfo();
+    }
+  });
+}
+
+// 显示灵活日期信息
+function renderFlexibleDatesInfo() {
+  const trendSection = document.getElementById('price-trend-section');
+  if (!trendSection) return;
+
+  // 在趋势图下方显示日期价格
+  let infoHtml = `
+    <div id="flexible-dates-info" class="mt-4 grid grid-cols-7 gap-2 text-center">
+      ${generateFlexibleDatesHTML()}
+    </div>
+  `;
+
+  // 移除已存在的
+  const existing = document.getElementById('flexible-dates-info');
+  if (existing) existing.remove();
+
+  trendSection.insertAdjacentHTML('beforeend', infoHtml);
+}
+
+// 隐藏灵活日期信息
+function hideFlexibleDatesInfo() {
+  const existing = document.getElementById('flexible-dates-info');
+  if (existing) existing.remove();
+}
+
+// 生成灵活日期HTML
+function generateFlexibleDatesHTML() {
+  const dates = [];
+  const today = new Date();
+  const currentPrice = 1200; // 从选中航班获取
+
+  for (let i = -3; i <= 3; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() + i);
+    const dateStr = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+    const dayName = ['日', '一', '二', '三', '四', '五', '六'][date.getDay()];
+
+    // 模拟价格波动
+    const priceVariation = Math.floor(Math.random() * 400) - 200;
+    const price = Math.max(800, currentPrice + priceVariation);
+    const isLowest = i === 0;
+    const isToday = i === 0;
+
+    dates.push(`
+      <div class="${isToday ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'} border rounded-lg p-2 ${isLowest ? 'ring-2 ring-green-500' : ''}">
+        <div class="text-xs text-gray-500">${dateStr}</div>
+        <div class="text-xs text-gray-400">周${dayName}</div>
+        <div class="font-bold ${price < currentPrice ? 'text-green-600' : 'text-gray-700'}">¥${price}</div>
+        ${isLowest ? '<div class="text-xs text-green-600 font-medium">最低</div>' : ''}
+        ${price < currentPrice ? '<div class="text-xs text-green-500">省' + (currentPrice - price) + '</div>' : ''}
+      </div>
+    `);
+  }
+  return dates.join('');
+}
+
+// 渲染价格趋势图
+function renderPriceTrend() {
+  const canvas = document.getElementById('price-trend-chart');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const width = canvas.offsetWidth;
+  const height = canvas.offsetHeight;
+
+  canvas.width = width;
+  canvas.height = height;
+
+  // 模拟30天价格数据
+  const prices = [];
+  const basePrice = 1200;
+  for (let i = 0; i < 30; i++) {
+    const variation = Math.sin(i / 5) * 200 + Math.random() * 100;
+    prices.push(basePrice + variation);
+  }
+
+  // 绘制
+  ctx.clearRect(0, 0, width, height);
+
+  // 绘制填充
+  const gradient = ctx.createLinearGradient(0, 0, 0, height);
+  gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+  gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+  ctx.beginPath();
+  ctx.moveTo(0, height);
+
+  prices.forEach((price, i) => {
+    const x = (i / (prices.length - 1)) * width;
+    const y = height - ((price - 800) / 800) * height;
+    if (i === 0) {
+      ctx.lineTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+
+  ctx.lineTo(width, height);
+  ctx.closePath();
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  // 绘制线
+  ctx.beginPath();
+  prices.forEach((price, i) => {
+    const x = (i / (prices.length - 1)) * width;
+    const y = height - ((price - 800) / 800) * height;
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 绘制数据点
+  prices.forEach((price, i) => {
+    const x = (i / (prices.length - 1)) * width;
+    const y = height - ((price - 800) / 800) * height;
+
+    // 今天的数据点高亮
+    if (i === prices.length - 1) {
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#3b82f6';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  });
+
+  // 更新当前价格显示
+  const currentPriceEl = document.getElementById('trend-current-price');
+  if (currentPriceEl) {
+    const currentPrice = prices[prices.length - 1];
+    const lowestPrice = Math.min(...prices);
+    const isLowest = currentPrice === lowestPrice;
+    currentPriceEl.innerHTML = isLowest
+      ? `<span class="text-green-600">当前: ¥${Math.round(currentPrice)} (最低价!)</span>`
+      : `当前: ¥${Math.round(currentPrice)}`;
+  }
+}
 
 // 添加一个显示通知的函数（如果不存在）
 if (typeof showNotification === 'undefined') {
