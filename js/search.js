@@ -107,12 +107,12 @@ function createFlightCard(flight) {
       const scorePercent = Math.round(score);
       // 只有每第5个卡片(5,10,15...)才显示反馈按钮
       const feedbackHtml = (flightCardCounter % 5 === 0) && typeof createFeedbackButtons === 'function'
-        ? `<div class="absolute top-10 left-4 bg-white rounded-lg shadow-lg border border-purple-200 p-2 z-10">
+        ? `<div class="absolute top-10 right-16 bg-white rounded-lg shadow-lg border border-purple-200 p-2 z-10">
             ${createFeedbackButtons(flight.id, 'search', score)}
            </div>`
         : '';
       aiRecommendationBadge = `
-        <div class="absolute top-4 left-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow cursor-pointer hover:from-purple-600 hover:to-indigo-600 transition-colors" onclick="toggleSearchFeedback(this)">
+        <div class="absolute top-4 right-16 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow cursor-pointer hover:from-purple-600 hover:to-indigo-600 transition-colors" onclick="toggleSearchFeedback(this)">
           <i class="fas fa-robot mr-1"></i>AI推荐 ${scorePercent}分
         </div>
         ${feedbackHtml}
