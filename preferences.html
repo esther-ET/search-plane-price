@@ -82,9 +82,9 @@
                 <p class="text-gray-600">设置您的旅行偏好，获得更精准的推荐</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div class="flex flex-col lg:flex-row gap-8">
                 <!-- 左侧设置区域 -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="flex-1 space-y-6">
                     <!-- 基础偏好 -->
                     <div class="bg-white rounded-xl preference-card p-6">
                         <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
@@ -236,55 +236,55 @@
                 </div>
 
                 <!-- 右侧摘要 -->
-                <div class="lg:col-span-1 space-y-6 sticky top-8">
-                    <!-- 保存设置卡片 -->
-                    <div class="bg-white rounded-xl preference-card p-6 sticky top-8">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">设置摘要</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">常用出发地</span>
-                                <span class="font-medium text-gray-800" id="summary-departure">未设置</span>
+                <div class="w-full lg:w-80 flex-shrink-0">
+                    <div class="space-y-6 sticky top-8">
+                        <!-- 保存设置卡片 -->
+                        <div class="bg-white rounded-xl preference-card p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">设置摘要</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">常用出发地</span>
+                                    <span class="font-medium text-gray-800" id="summary-departure">未设置</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">价格敏感度</span>
+                                    <span class="font-medium text-gray-800" id="summary-sensitivity">中等</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">价格提醒</span>
+                                    <span class="font-medium text-green-600" id="summary-alerts">开启</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">特价推送</span>
+                                    <span class="font-medium text-green-600" id="summary-deals">开启</span>
+                                </div>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">价格敏感度</span>
-                                <span class="font-medium text-gray-800" id="summary-sensitivity">中等</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">价格提醒</span>
-                                <span class="font-medium text-green-600" id="summary-alerts">开启</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">特价推送</span>
-                                <span class="font-medium text-green-600" id="summary-deals">开启</span>
+                            <div class="mt-8 space-y-4">
+                                <button id="save-preferences"
+                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200 flex items-center justify-center">
+                                    <i class="fas fa-save mr-2"></i>保存设置
+                                </button>
+                                <button id="reset-preferences"
+                                        class="w-full border border-gray-300 text-gray-700 font-medium py-3 rounded-lg transition duration-200 hover:bg-gray-50">
+                                    恢复默认
+                                </button>
                             </div>
                         </div>
 
-                        <div class="mt-8 space-y-4">
-                            <button id="save-preferences"
-                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200 flex items-center justify-center">
-                                <i class="fas fa-save mr-2"></i>保存设置
-                            </button>
-                            <button id="reset-preferences"
-                                    class="w-full border border-gray-300 text-gray-700 font-medium py-3 rounded-lg transition duration-200 hover:bg-gray-50">
-                                恢复默认
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 价格提醒管理 -->
-                    <div class="bg-white rounded-xl preference-card p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">我的价格提醒</h3>
-                        <div id="active-alerts" class="space-y-3">
-                            <!-- 动态加载的价格提醒 -->
-                            <div class="text-center py-4 text-gray-500">
-                                <i class="fas fa-bell-slash text-2xl mb-2"></i>
-                                <p>暂无活跃的价格提醒</p>
+                        <!-- 价格提醒管理 -->
+                        <div class="bg-white rounded-xl preference-card p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">我的价格提醒</h3>
+                            <div id="active-alerts" class="space-y-3">
+                                <div class="text-center py-4 text-gray-500">
+                                    <i class="fas fa-bell-slash text-2xl mb-2"></i>
+                                    <p>暂无活跃的价格提醒</p>
+                                </div>
                             </div>
+                            <button onclick="window.location.href='search.html'"
+                                    class="w-full mt-4 border border-blue-600 text-blue-600 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 transition duration-200">
+                                <i class="fas fa-plus mr-2"></i>添加新提醒
+                            </button>
                         </div>
-                        <button onclick="window.location.href='search.html'"
-                                class="w-full mt-4 border border-blue-600 text-blue-600 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 transition duration-200">
-                            <i class="fas fa-plus mr-2"></i>添加新提醒
-                        </button>
                     </div>
                 </div>
             </div>
