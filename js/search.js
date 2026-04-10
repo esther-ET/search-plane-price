@@ -126,7 +126,7 @@ function createFlightCard(flight) {
   // 40%+：显示在卡片右上角，特价标签左边（同一水平线）
   // 30-39%：显示在价格上方
   const discountBadge40 = flight.discount >= 40 ?
-    `<div class="absolute top-4 right-20 bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded shadow z-10">-${flight.discount}%</div>` : '';
+    `<div class="absolute top-4 right-30 bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded shadow z-10">-${flight.discount}%</div>` : '';
   const discountBadge30 = flight.discount >= 30 && flight.discount < 40 ?
     `<span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mr-2">-${flight.discount}%</span>` : '';
 
@@ -192,7 +192,7 @@ function createFlightCard(flight) {
           </div>
 
           <!-- 价格和操作 -->
-          <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6 md:w-64">
+          <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6 md:w-64 ${flightCardCounter % 5 === 0 && typeof createFeedbackButtons === 'function' ? 'pb-8' : ''}">
             <div class="text-right">
               ${discountBadge30 ? `<div class="mb-1">${discountBadge30}</div>` : ''}
               <div class="text-3xl font-bold text-gray-800">¥${flight.price.toLocaleString('zh-CN')}</div>
