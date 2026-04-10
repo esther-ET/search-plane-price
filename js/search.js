@@ -107,7 +107,7 @@ function createFlightCard(flight) {
       const scorePercent = Math.round(score);
       // 反馈按钮已移除，放在"查看详情"下方
       aiRecommendationBadge = `
-        <div class="absolute top-4 right-10 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
+        <div class="absolute top-4 right-20 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
           <i class="fas fa-robot mr-1"></i>AI推荐 ${scorePercent}分
         </div>
       `;
