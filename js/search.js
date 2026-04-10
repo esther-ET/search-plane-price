@@ -507,6 +507,36 @@ function updateSearchSummary() {
   }
 }
 
+// 搜索页的提交搜索函数 - 直接筛选，不跳转
+function submitSearch() {
+  const departureInput = document.getElementById('search-departure');
+  const arrivalInput = document.getElementById('search-arrival');
+  const dateInput = document.getElementById('search-date');
+  const passengerSelect = document.getElementById('passenger-count');
+  const preferDirectCheckbox = document.getElementById('prefer-direct');
+  const allowTransitCheckbox = document.getElementById('allow-transit');
+
+  const departure = departureInput ? departureInput.value.trim() : '上海';
+  const arrival = arrivalInput ? arrivalInput.value.trim() : '';
+  const passengers = passengerSelect ? passengerSelect.value : '1';
+  const preferDirect = preferDirectCheckbox ? preferDirectCheckbox.checked : false;
+  const allowTransit = allowTransitCheckbox ? allowTransitCheckbox.checked : true;
+
+  // 更新中转偏好筛选状态
+  currentFilters.preferDirect = preferDirect;
+  currentFilters.allowTransit = allowTransit;
+
+  // 保存到搜索历史
+  if (arrival) {
+    SearchHistory.addSearch(departure, arrival);
+  }
+
+  // 重新应用筛选
+  applyFilters();
+
+  showNotification('已根据新条件筛选航班', 'success');
+}
+
 // 格式化日期
 function formatDate(dateStr) {
   const date = new Date(dateStr);
