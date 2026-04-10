@@ -176,11 +176,36 @@ function createFlightCard(flight, isFeatured = false) {
   const discountBadge = flight.discount >= 30 ?
     `<div class="absolute top-4 right-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">-${flight.discount}%</div>` : '';
 
+  // 紧迫感提示（座位剩余和价格过期）
+  let urgencyHtml = '';
+  if (flight.seatsLeft && flight.seatsLeft < 10) {
+    urgencyHtml += `
+      <div class="mt-2 flex items-center text-xs text-red-600">
+        <i class="fas fa-fire mr-1"></i>
+        <span>仅剩 <strong>${flight.seatsLeft}</strong> 个座位</span>
+      </div>
+    `;
+  }
+  if (flight.validUntil) {
+    const validDate = new Date(flight.validUntil);
+    const now = new Date();
+    const hoursLeft = Math.max(0, Math.round((validDate - now) / 3600000));
+    if (hoursLeft < 48) {
+      urgencyHtml += `
+        <div class="mt-1 flex items-center text-xs text-orange-600">
+          <i class="fas fa-clock mr-1"></i>
+          <span>${hoursLeft <= 0 ? '即将过期' : `${hoursLeft}小时后过期`}</span>
+        </div>
+      `;
+    }
+  }
+
   // 价格显示
   const priceHtml = flight.originalPrice ?
     `<div class="mt-4">
       <div class="text-3xl font-bold text-gray-800">¥${flight.price.toLocaleString('zh-CN')}</div>
       <div class="text-gray-500 line-through text-sm">原价 ¥${flight.originalPrice.toLocaleString('zh-CN')}</div>
+      ${urgencyHtml}
     </div>` :
     `<div class="text-3xl font-bold text-gray-800 mt-4">¥${flight.price.toLocaleString('zh-CN')}</div>`;
 

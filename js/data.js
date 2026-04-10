@@ -20,7 +20,8 @@ const flightData = {
       stops: 0,
       isSpecial: true,
       tags: ["限时特价", "直飞", "早鸟优惠"],
-      validUntil: "2025-04-12T23:59:59"
+      seatsLeft: 5,
+      validUntil: new Date(Date.now() + 6 * 3600000).toISOString()
     },
     {
       id: 102,
@@ -38,7 +39,8 @@ const flightData = {
       stops: 0,
       isSpecial: true,
       tags: ["海岛度假", "直飞", "热门"],
-      validUntil: "2025-04-18T23:59:59"
+      seatsLeft: 12,
+      validUntil: new Date(Date.now() + 24 * 3600000).toISOString()
     },
     {
       id: 103,
@@ -56,7 +58,8 @@ const flightData = {
       stops: 0,
       isSpecial: true,
       tags: ["商务优选", "直飞", "五星航空"],
-      validUntil: "2025-05-05T23:59:59"
+      seatsLeft: 8,
+      validUntil: new Date(Date.now() + 48 * 3600000).toISOString()
     }
   ],
 
