@@ -5,7 +5,7 @@ let currentFilters = {
   minPrice: 500,
   maxPrice: 3000,
   airlines: flightData.filters.airlines, // 默认全选
-  specialOnly: false,
+  specialOnly: false, // 默认不勾选"仅显示特价"
   cabins: ['经济舱'], // 支持多选舱位
   preferDirect: false,
   allowTransit: true,
@@ -380,8 +380,8 @@ function applyFilters() {
       return false;
     }
 
-    // 仅显示特价
-    if (currentFilters.specialOnly && !flight.isSpecial) {
+    // 仅显示特价（折扣40%以上）
+    if (currentFilters.specialOnly && flight.discount < 40) {
       return false;
     }
 
@@ -435,7 +435,7 @@ function resetFilters() {
   });
 
   const specialOnly = document.getElementById('specialOnly');
-  if (specialOnly) specialOnly.checked = true;
+  if (specialOnly) specialOnly.checked = false;
 
   // 重置中转偏好
   const preferDirect = document.getElementById('prefer-direct');
@@ -448,7 +448,7 @@ function resetFilters() {
     minPrice: 500,
     maxPrice: 3000,
     airlines: ['中国东方航空', '中国国际航空', '南方航空', '国泰航空'],
-    specialOnly: true,
+    specialOnly: false,
     cabins: ['经济舱'],
     preferDirect: false,
     allowTransit: true,
@@ -622,9 +622,9 @@ function applyUserPreferences() {
 
   // 应用航空公司偏好
   if (preferences.airlinePreferences && preferences.airlinePreferences.length > 0) {
-    // 更新复选框状态
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
+    // 只更新航空公司相关的复选框
+    const airlineCheckboxes = document.querySelectorAll('.airline-checkbox');
+    airlineCheckboxes.forEach(checkbox => {
       const label = checkbox.parentElement.querySelector('span');
       if (label) {
         const airlineName = label.textContent;
