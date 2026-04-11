@@ -111,7 +111,7 @@
                     </select>
                 </div>
                 <div class="flex items-end">
-                    <button onclick="submitSearch()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200 flex items-center justify-center">
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200 flex items-center justify-center search-btn">
                         <i class="fas fa-search mr-2"></i>搜索特价
                     </button>
                 </div>
@@ -123,7 +123,7 @@
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- 筛选侧边栏 -->
             <aside class="lg:w-1/4">
-                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-8 filter-sidebar">
                     <h3 class="text-xl font-bold text-gray-800 mb-6">筛选条件</h3>
 
                     <!-- 使用我的偏好 -->
@@ -247,8 +247,8 @@
                         <p class="text-sm text-gray-500 mt-1">显示折扣40%以上的航班</p>
                     </div>
 
-                    <button onclick="applyFilters()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200">
-                        应用筛选
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200 reset-filters-btn">
+                        重置筛选
                     </button>
                 </div>
             </aside>
@@ -264,7 +264,7 @@
                         </div>
                         <div class="flex items-center space-x-4">
                             <div class="relative">
-                                <select class="appearance-none bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <select class="appearance-none bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sort-select">
                                     <option>价格从低到高</option>
                                     <option>价格从高到低</option>
                                     <option>出发时间最早</option>
@@ -272,7 +272,7 @@
                                 </select>
                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-500"></i>
                             </div>
-                            <button onclick="resetFilters()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            <button class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 reset-filters-btn">
                                 重置
                             </button>
                         </div>
