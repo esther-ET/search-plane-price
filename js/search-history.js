@@ -128,12 +128,86 @@ const SearchHistory = {
   }
 };
 
+// 从航班数据中获取热门目的地（动态，基于实际航班数据）
+function getPopularDestinationsFromFlights() {
+  // 硬编码的热门目的地映射表（城市 -> icon）
+  const cityIconMap = {
+    '东京': '🇯🇵', '大阪': '🇯🇵', '名古屋': '🇯🇵', '福冈': '🇯🇵',
+    '曼谷': '🇹🇭', '清迈': '🇹🇭', '普吉岛': '🇹🇭',
+    '新加坡': '🇸🇬',
+    '首尔': '🇰🇷', '济州岛': '🇰🇷',
+    '台北': '🇹🇼', '高雄': '🇹🇼',
+    '巴黎': '🇫🇷',
+    '伦敦': '🇬🇧',
+    '纽约': '🇺🇸', '洛杉矶': '🇺🇸', '旧金山': '🇺🇸',
+    '悉尼': '🇦🇺', '墨尔本': '🇦🇺',
+    '迪拜': '🇦🇪',
+    '香港': '🇭🇰', '上海': '🇨🇳', '北京': '🇨🇳', '广州': '🇨🇳', '深圳': '🇨🇳', '成都': '🇨🇳', '杭州': '🇨🇳',
+    '马尼拉': '🇵🇭',
+    '伊斯坦布尔': '🇹🇷',
+    '卡萨布兰卡': '🇲🇦',
+    '亚的斯亚贝巴': '🇪🇹'
+  };
+
+  // 航班数据中的目的地城市集合
+  const flightDestinations = new Set();
+
+  // 从flightData.flights获取目的地
+  if (window.flightData && window.flightData.flights) {
+    window.flightData.flights.forEach(flight => {
+      if (flight.arrival && flight.arrival.city) {
+        flightDestinations.add(flight.arrival.city);
+      }
+    });
+  }
+
+  // 从flightData.recommendations获取目的地
+  if (window.flightData && window.flightData.recommendations) {
+    window.flightData.recommendations.forEach(flight => {
+      if (flight.arrival && flight.arrival.city) {
+        flightDestinations.add(flight.arrival.city);
+      }
+    });
+  }
+
+  // 只保留航班数据中存在的城市
+  const validDestinations = SearchHistory.popularDestinations.filter(
+    dest => flightDestinations.has(dest.city)
+  );
+
+  // 如果有效目的地少于4个，使用allCities中存在于航班数据中的城市补充
+  if (validDestinations.length < 4 && window.flightData) {
+    const allWithFlights = SearchHistory.allCities.filter(
+      city => flightDestinations.has(city.city)
+    );
+    // 补充城市
+    const needed = 8 - validDestinations.length;
+    const cityNames = new Set(validDestinations.map(d => d.city));
+    for (const city of allWithFlights) {
+      if (!cityNames.has(city.city)) {
+        validDestinations.push({
+          city: city.city,
+          country: city.country,
+          icon: cityIconMap[city.city] || '🏙️'
+        });
+        cityNames.add(city.city);
+        if (validDestinations.length >= 8) break;
+      }
+    }
+  }
+
+  return validDestinations.slice(0, 8); // 最多8个
+}
+
 // 生成热门目的地HTML
 function renderPopularDestinations(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  const html = SearchHistory.popularDestinations.map(dest => `
+  // 基于航班数据动态获取热门目的地
+  const popularCities = getPopularDestinationsFromFlights();
+
+  const html = popularCities.map(dest => `
     <button onclick="quickSearch('${dest.city}')"
       class="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-full hover:bg-blue-50 hover:border-blue-300 transition-colors">
       <span class="mr-2">${dest.icon}</span>
@@ -182,12 +256,17 @@ function renderSearchHistory(containerId) {
 }
 
 // 快速搜索（从热门目的地或历史点击）
-function quickSearch(arrival, departure = '上海') {
+// 注意：热门目的地不设置出发城市，只设置到达城市，以显示所有出发地的航班
+function quickSearch(arrival, departure = '') {
   // 保存到搜索历史
-  SearchHistory.addSearch(departure, arrival);
+  SearchHistory.addSearch(departure || '上海', arrival);
 
-  // 跳转到搜索页（可以带上参数）
-  window.location.href = `search.html?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`;
+  // 跳转到搜索页 - 热门目的地不限制出发城市，只筛选目的地
+  let url = `search.html?to=${encodeURIComponent(arrival)}`;
+  if (departure) {
+    url += `&from=${encodeURIComponent(departure)}`;
+  }
+  window.location.href = url;
 }
 
 // 清除搜索历史
@@ -430,8 +509,244 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// ============================================
+// 统一的搜索状态管理 - 首页和搜索页状态同步
+// ============================================
+const SearchState = {
+  STORAGE_KEY: 'searchState',
+
+  // 默认状态
+  DEFAULT_STATE: {
+    departure: '上海',
+    arrival: '',
+    date: '',
+    passengers: '1',
+    preferDirect: false,
+    allowTransit: true,
+    // 筛选器状态
+    minPrice: 500,
+    maxPrice: 3000,
+    airlines: [],
+    cabins: [],
+    specialOnly: true
+  },
+
+  // 获取当前状态
+  getState() {
+    try {
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        return { ...this.DEFAULT_STATE, ...JSON.parse(saved) };
+      }
+    } catch (error) {
+      console.error('获取搜索状态失败:', error);
+    }
+    return { ...this.DEFAULT_STATE };
+  },
+
+  // 保存状态
+  saveState(state) {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('保存搜索状态失败:', error);
+    }
+  },
+
+  // 从当前页面收集状态
+  collectFromPage() {
+    const state = {};
+
+    // 收集搜索条件
+    const departureInput = document.getElementById('search-departure');
+    const arrivalInput = document.getElementById('search-arrival');
+    const dateInput = document.getElementById('search-date');
+    const passengerSelect = document.getElementById('passenger-count');
+
+    state.departure = departureInput ? departureInput.value.trim() || '上海' : '上海';
+    state.arrival = arrivalInput ? arrivalInput.value.trim() : '';
+    state.date = dateInput ? dateInput.value : '';
+    state.passengers = passengerSelect ? passengerSelect.value : '1';
+
+    // 收集中转偏好
+    const preferDirect = document.getElementById('prefer-direct');
+    const allowTransit = document.getElementById('allow-transit');
+    state.preferDirect = preferDirect ? preferDirect.checked : false;
+    state.allowTransit = allowTransit ? allowTransit.checked : true;
+
+    // 收集筛选器状态（仅在搜索页）
+    const priceRange = document.getElementById('priceRange');
+    if (priceRange) {
+      state.minPrice = 500;
+      state.maxPrice = parseInt(priceRange.value) || 3000;
+    }
+
+    // 收集航空公司
+    const airlineCheckboxes = document.querySelectorAll('.airline-checkbox');
+    if (airlineCheckboxes.length > 0) {
+      state.airlines = [];
+      airlineCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          const airlineName = checkbox.parentElement.querySelector('span').textContent;
+          state.airlines.push(airlineName);
+        }
+      });
+    }
+
+    // 收集舱位
+    const cabinCheckboxes = document.querySelectorAll('.cabin-checkbox');
+    if (cabinCheckboxes.length > 0) {
+      state.cabins = [];
+      cabinCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          const cabinName = checkbox.parentElement.querySelector('span').textContent;
+          state.cabins.push(cabinName);
+        }
+      });
+    }
+
+    // 收集特价筛选
+    const specialOnly = document.getElementById('specialOnly');
+    state.specialOnly = specialOnly ? specialOnly.checked : true;
+
+    return state;
+  },
+
+  // 应用状态到当前页面
+  applyToPage(state) {
+    // 应用搜索条件
+    const departureInput = document.getElementById('search-departure');
+    const arrivalInput = document.getElementById('search-arrival');
+    const dateInput = document.getElementById('search-date');
+    const passengerSelect = document.getElementById('passenger-count');
+
+    if (departureInput && state.departure) departureInput.value = state.departure;
+    if (arrivalInput && state.arrival) arrivalInput.value = state.arrival;
+    if (dateInput && state.date) dateInput.value = state.date;
+    if (passengerSelect && state.passengers) passengerSelect.value = state.passengers;
+
+    // 应用中转偏好
+    const preferDirect = document.getElementById('prefer-direct');
+    const allowTransit = document.getElementById('allow-transit');
+    if (preferDirect) preferDirect.checked = state.preferDirect;
+    if (allowTransit) allowTransit.checked = state.allowTransit;
+
+    // 应用价格范围
+    const priceRange = document.getElementById('priceRange');
+    const priceValue = document.getElementById('priceValue');
+    if (priceRange && state.maxPrice) {
+      priceRange.value = Math.min(state.maxPrice, parseInt(priceRange.max) || 5000);
+      if (priceValue) {
+        priceValue.textContent = `¥500 - ¥${priceRange.value}`;
+      }
+    }
+
+    // 应用航空公司
+    const airlineCheckboxes = document.querySelectorAll('.airline-checkbox');
+    if (airlineCheckboxes.length > 0 && state.airlines) {
+      airlineCheckboxes.forEach(checkbox => {
+        const airlineName = checkbox.parentElement.querySelector('span').textContent;
+        checkbox.checked = state.airlines.includes(airlineName);
+      });
+    }
+
+    // 应用舱位
+    const cabinCheckboxes = document.querySelectorAll('.cabin-checkbox');
+    if (cabinCheckboxes.length > 0 && state.cabins) {
+      cabinCheckboxes.forEach(checkbox => {
+        const cabinName = checkbox.parentElement.querySelector('span').textContent;
+        checkbox.checked = state.cabins.includes(cabinName);
+      });
+    }
+
+    // 应用特价筛选
+    const specialOnly = document.getElementById('specialOnly');
+    if (specialOnly) specialOnly.checked = state.specialOnly;
+  },
+
+  // 初始化页面状态（优先从URL恢复，否则从localStorage恢复）
+  initPageState() {
+    // 首先尝试从URL恢复
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get('from');
+    const to = params.get('to');
+    const date = params.get('date');
+    const passengers = params.get('passengers');
+
+    // 如果URL中有参数，使用URL参数
+    if (from || to) {
+      const state = this.getState();
+      // 只有明确指定了出发城市才设置，热门搜索不限制出发城市
+      if (from) state.departure = decodeURIComponent(from);
+      if (to) state.arrival = decodeURIComponent(to);
+      if (date) state.date = decodeURIComponent(date);
+      if (passengers) state.passengers = decodeURIComponent(passengers);
+      if (params.get('preferDirect')) state.preferDirect = params.get('preferDirect') === 'true';
+      if (params.get('allowTransit')) state.allowTransit = params.get('allowTransit') === 'true';
+      this.saveState(state);
+      this.applyToPage(state);
+      return true;
+    }
+
+    // 否则从localStorage恢复
+    const savedState = this.getState();
+    // 只有当有保存的目的地时才应用状态
+    if (savedState.arrival || savedState.departure) {
+      this.applyToPage(savedState);
+      return true;
+    }
+
+    return false;
+  },
+
+  // 同步当前筛选状态到localStorage
+  syncFiltersToStorage() {
+    const state = this.collectFromPage();
+    this.saveState(state);
+  }
+};
+
+// 修改submitSearch函数使用SearchState
+const originalSubmitSearch = submitSearch;
+submitSearch = function() {
+  const departureInput = document.getElementById('search-departure');
+  const arrivalInput = document.getElementById('search-arrival');
+  const dateInput = document.getElementById('search-date');
+  const passengerSelect = document.getElementById('passenger-count');
+
+  const departure = departureInput ? departureInput.value.trim() || '上海' : '上海';
+  const arrival = arrivalInput ? arrivalInput.value.trim() : '';
+  const date = dateInput ? dateInput.value : '';
+  const passengers = passengerSelect ? passengerSelect.value : '1';
+
+  if (!arrival) {
+    if (arrivalInput) arrivalInput.focus();
+    return;
+  }
+
+  // 使用SearchState保存状态
+  const state = SearchState.getState();
+  state.departure = departure;
+  state.arrival = arrival;
+  state.date = date;
+  state.passengers = passengers;
+  SearchState.saveState(state);
+
+  // 保存到搜索历史
+  SearchHistory.addSearch(departure, arrival);
+
+  // 跳转到搜索页（不传递中转偏好，让搜索页从localStorage读取）
+  let url = `search.html?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`;
+  if (date) {
+    url += `&date=${encodeURIComponent(date)}`;
+  }
+  url += `&passengers=${encodeURIComponent(passengers)}`;
+  window.location.href = url;
+};
+
 // 导出到全局
 window.SearchHistory = SearchHistory;
+window.SearchState = SearchState;
 window.quickSearch = quickSearch;
 window.submitSearch = submitSearch;
 window.clearSearchHistory = clearSearchHistory;

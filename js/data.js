@@ -5,7 +5,7 @@ const flightData = {
   // 首页推荐特价航班
   recommendations: [
     {
-      id: 101,
+      id: 104,
       airline: "中国东方航空",
       airlineLogo: "MU",
       flightNumber: "MU586",

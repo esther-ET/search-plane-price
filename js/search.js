@@ -230,7 +230,7 @@ function createFlightCard(flight) {
 
 // 设置筛选事件
 function setupFilterEvents() {
-  // 价格滑块 - 只更新状态，由应用筛选按钮触发
+  // 价格滑块 - 实时触发筛选
   const priceRange = document.getElementById('priceRange');
   const priceValue = document.getElementById('priceValue');
 
@@ -239,25 +239,18 @@ function setupFilterEvents() {
       const value = parseInt(this.value);
       priceValue.textContent = `¥500 - ¥${value}`;
       currentFilters.maxPrice = value;
-    });
-    priceRange.addEventListener('change', function() {
-      applyFilters();
+      applyFilters(); // 实时触发筛选
+      syncSearchState(); // 同步状态
     });
   }
 
-  // 航空公司复选框
-  const airlineCheckboxes = document.querySelectorAll('aside input[type="checkbox"]');
+  // 航空公司复选框 - 使用airline-checkbox类选择器
+  const airlineCheckboxes = document.querySelectorAll('.airline-checkbox');
   airlineCheckboxes.forEach(checkbox => {
-    // 跳过舱位和中转偏好复选框（它们有自己的事件处理）
-    if (checkbox.classList.contains('cabin-checkbox') ||
-        checkbox.id === 'prefer-direct' ||
-        checkbox.id === 'allow-transit' ||
-        checkbox.id === 'specialOnly') {
-      return;
-    }
     checkbox.addEventListener('change', function() {
       updateSelectedAirlines();
       applyFilters();
+      syncSearchState(); // 同步状态
     });
   });
 
@@ -267,6 +260,7 @@ function setupFilterEvents() {
     specialOnly.addEventListener('change', function() {
       currentFilters.specialOnly = this.checked;
       applyFilters();
+      syncSearchState(); // 同步状态
     });
   }
 
@@ -276,10 +270,11 @@ function setupFilterEvents() {
     checkbox.addEventListener('change', function() {
       updateSelectedCabins();
       applyFilters();
+      syncSearchState(); // 同步状态
     });
   });
 
-  // 中转偏好 - 优先直飞（互斥：选这个就不能选包含中转）
+  // 中转偏好 - 优先直飞
   const preferDirect = document.getElementById('prefer-direct');
   if (preferDirect) {
     preferDirect.addEventListener('change', function() {
@@ -290,13 +285,18 @@ function setupFilterEvents() {
         currentFilters.preferDirect = true;
         currentFilters.allowTransit = false;
       } else {
+        // 取消勾选时，两个都恢复默认状态（显示全部航班）
         currentFilters.preferDirect = false;
+        currentFilters.allowTransit = true;
+        const allowTransit = document.getElementById('allow-transit');
+        if (allowTransit) allowTransit.checked = true;
       }
       applyFilters();
+      syncSearchState(); // 同步状态
     });
   }
 
-  // 中转偏好 - 包含中转（勾选即显示所有航班）
+  // 中转偏好 - 包含中转
   const allowTransit = document.getElementById('allow-transit');
   if (allowTransit) {
     allowTransit.addEventListener('change', function() {
@@ -307,23 +307,31 @@ function setupFilterEvents() {
         currentFilters.allowTransit = true;
         currentFilters.preferDirect = false;
       } else {
+        // 取消勾选时，两个都恢复默认状态（显示全部航班）
         currentFilters.allowTransit = false;
+        currentFilters.preferDirect = false;
+        const preferDirectEl = document.getElementById('prefer-direct');
+        if (preferDirectEl) preferDirectEl.checked = false;
       }
       applyFilters();
+      syncSearchState(); // 同步状态
     });
+  }
+}
+
+// 同步搜索状态到localStorage
+function syncSearchState() {
+  if (window.SearchState) {
+    SearchState.syncFiltersToStorage();
   }
 }
 
 // 更新选中的航空公司
 function updateSelectedAirlines() {
-  const checkboxes = document.querySelectorAll('aside input[type="checkbox"]');
+  const checkboxes = document.querySelectorAll('.airline-checkbox');
   currentFilters.airlines = [];
 
   checkboxes.forEach(checkbox => {
-    // 跳过非航空公司复选框
-    if (checkbox.classList.contains('cabin-checkbox')) return;
-    if (checkbox.id === 'prefer-direct' || checkbox.id === 'allow-transit') return;
-    if (checkbox.id === 'specialOnly') return;
     if (checkbox.checked) {
       const airlineName = checkbox.parentElement.querySelector('span').textContent;
       currentFilters.airlines.push(airlineName);
@@ -378,14 +386,12 @@ function applyFilters() {
     }
 
     // 中转偏好筛选
-    // 优先直飞时过滤掉所有中转航班
+    // 只有明确勾选"优先直飞"时才过滤中转航班
     if (currentFilters.preferDirect && flight.stops > 0) {
       return false;
     }
-    // 包含中转未勾选且非优先直飞模式时，也过滤中转航班
-    if (!currentFilters.allowTransit && !currentFilters.preferDirect && flight.stops > 0) {
-      return false;
-    }
+    // 默认状态（两个都不勾选或只有allowTransit勾选）都显示全部航班
+    // 无需额外筛选逻辑
 
     return true;
   });
@@ -413,20 +419,19 @@ function resetFilters() {
 
   const priceValue = document.getElementById('priceValue');
   if (priceValue) priceValue.textContent = '¥500 - ¥2500';
+  currentFilters.maxPrice = 3000;
 
-  // 重置航空公司复选框（除了舱位）
-  const airlineCheckboxes = document.querySelectorAll('aside input[type="checkbox"]');
+  // 重置航空公司复选框 - 使用airline-checkbox类
+  const airlineCheckboxes = document.querySelectorAll('.airline-checkbox');
   airlineCheckboxes.forEach(checkbox => {
-    // 舱位复选框需要特殊处理
-    if (!checkbox.classList.contains('cabin-checkbox')) {
-      checkbox.checked = true;
-    }
+    checkbox.checked = true;
   });
 
   // 重置舱位复选框 - 默认只选经济舱
   const cabinCheckboxes = document.querySelectorAll('.cabin-checkbox');
   cabinCheckboxes.forEach(checkbox => {
-    checkbox.checked = checkbox.parentElement.querySelector('span').textContent === '经济舱';
+    const cabinName = checkbox.parentElement.querySelector('span').textContent;
+    checkbox.checked = cabinName === '经济舱';
   });
 
   const specialOnly = document.getElementById('specialOnly');
@@ -442,7 +447,7 @@ function resetFilters() {
   currentFilters = {
     minPrice: 500,
     maxPrice: 3000,
-    airlines: flightData.filters.airlines,
+    airlines: ['中国东方航空', '中国国际航空', '南方航空', '国泰航空'],
     specialOnly: true,
     cabins: ['经济舱'],
     preferDirect: false,
@@ -524,10 +529,16 @@ function toggleFavorite(flightId, event) {
 }
 
 // 显示通知
-function showNotification(message) {
+function showNotification(message, type = 'success') {
   // 简单的通知实现
   const notification = document.createElement('div');
-  notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in';
+  const typeClasses = {
+    'info': 'bg-blue-500 text-white',
+    'success': 'bg-green-500 text-white',
+    'warning': 'bg-yellow-500 text-white',
+    'error': 'bg-red-500 text-white'
+  };
+  notification.className = `fixed top-4 right-4 ${typeClasses[type] || typeClasses.success} px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in`;
   notification.textContent = message;
   document.body.appendChild(notification);
 
@@ -628,14 +639,14 @@ function applyUserPreferences() {
   // 应用舱位偏好
   if (preferences.cabinPreferences && preferences.cabinPreferences.length > 0) {
     const firstCabin = preferences.cabinPreferences[0];
-    currentFilters.cabin = firstCabin;
+    currentFilters.cabins = [firstCabin];
 
-    // 更新单选按钮
-    const cabinRadios = document.querySelectorAll('input[name="cabin"]');
-    cabinRadios.forEach(radio => {
-      const label = radio.parentElement.querySelector('span');
-      if (label && label.textContent === firstCabin) {
-        radio.checked = true;
+    // 更新复选按钮
+    const cabinCheckboxes = document.querySelectorAll('.cabin-checkbox');
+    cabinCheckboxes.forEach(checkbox => {
+      const label = checkbox.parentElement.querySelector('span');
+      if (label) {
+        checkbox.checked = preferences.cabinPreferences.includes(label.textContent);
       }
     });
   }
@@ -729,10 +740,21 @@ function setupAIRecommendationEvents() {
 
 // 修改DOMContentLoaded事件
 document.addEventListener('DOMContentLoaded', function() {
-  // 恢复URL中的搜索条件
-  if (window.restoreSearchFromURL) {
+  // 使用SearchState初始化页面状态（优先从URL恢复，否则从localStorage恢复）
+  if (window.SearchState) {
+    SearchState.initPageState();
+  } else if (window.restoreSearchFromURL) {
+    // 兼容旧的restoreSearchFromURL
     restoreSearchFromURL();
   }
+
+  // 初始化完成后，同步筛选状态到currentFilters
+  syncFiltersToCurrentState();
+
+  // 先执行筛选（基于URL参数或localStorage中的搜索条件）
+  applyFilters();
+
+  // 再加载列表
   loadFlightList();
   setupFilterEvents();
   setupPreferenceEvents(); // 新增
@@ -741,9 +763,45 @@ document.addEventListener('DOMContentLoaded', function() {
   setupSorting();
   updateSearchSummary();
   renderPriceTrend(); // 渲染价格趋势图
-  // 恢复中转偏好设置
-  restoreTransitPreferences();
 });
+
+// 同步页面筛选器状态到currentFilters
+function syncFiltersToCurrentState() {
+  // 城市筛选 - 从输入框同步
+  const departureInput = document.getElementById('search-departure');
+  const arrivalInput = document.getElementById('search-arrival');
+  if (departureInput) {
+    currentFilters.departureCity = departureInput.value.trim();
+  }
+  if (arrivalInput) {
+    currentFilters.arrivalCity = arrivalInput.value.trim();
+  }
+
+  // 价格
+  const priceRange = document.getElementById('priceRange');
+  if (priceRange) {
+    currentFilters.minPrice = 500;
+    currentFilters.maxPrice = parseInt(priceRange.value) || 3000;
+  }
+
+  // 航空公司
+  updateSelectedAirlines();
+
+  // 舱位
+  updateSelectedCabins();
+
+  // 特价
+  const specialOnly = document.getElementById('specialOnly');
+  if (specialOnly) {
+    currentFilters.specialOnly = specialOnly.checked;
+  }
+
+  // 中转偏好
+  const preferDirect = document.getElementById('prefer-direct');
+  const allowTransit = document.getElementById('allow-transit');
+  if (preferDirect) currentFilters.preferDirect = preferDirect.checked;
+  if (allowTransit) currentFilters.allowTransit = allowTransit.checked;
+}
 
 // 恢复中转偏好设置
 function restoreTransitPreferences() {
@@ -926,30 +984,5 @@ function renderPriceTrend() {
     currentPriceEl.innerHTML = isLowest
       ? `<span class="text-green-600">当前: ¥${Math.round(currentPrice)} (最低价!)</span>`
       : `当前: ¥${Math.round(currentPrice)}`;
-  }
-}
-
-// 添加一个显示通知的函数（如果不存在）
-if (typeof showNotification === 'undefined') {
-  function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in ${
-      type === 'info' ? 'bg-blue-500 text-white' :
-      type === 'success' ? 'bg-green-500 text-white' :
-      'bg-yellow-500 text-white'
-    }`;
-    notification.innerHTML = `
-      <div class="flex items-center">
-        <i class="fas fa-${type === 'info' ? 'info-circle' : type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>
-        <span>${message}</span>
-      </div>
-    `;
-
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-      notification.classList.add('opacity-0', 'transition-opacity', 'duration-300');
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
   }
 }

@@ -1,6 +1,10 @@
 // 首页JavaScript逻辑
 
 document.addEventListener('DOMContentLoaded', function() {
+  // 使用SearchState恢复上次的搜索条件
+  if (window.SearchState) {
+    SearchState.initPageState();
+  }
   loadFeaturedFlights();
   setupSearchForm();
 });
@@ -153,7 +157,7 @@ function createFlightCard(flight, isFeatured = false) {
   card.addEventListener('click', function() {
     // 保存为最近查看的航班，用于协同过滤推荐
     try {
-      localStorage.setItem('recentFlightId', flight.id);
+      localStorage.setItem('recentFlightId', String(flight.id));
       localStorage.setItem('recentFlightTime', new Date().toISOString());
     } catch (error) {
       console.error('保存最近查看航班失败:', error);
